@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rutas - Transmetro en Linea</title>
+<link rel="stylesheet" href="/css/styles.css">
+<script src="/js/api.js"></script>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo" style="background:white;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.1)">
+    <img src="/assets/images/logos/Logo-Transmetro.png" alt="Transmetro en Linea" style="width:100%;max-width:175px;height:auto;display:block">
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <a class="nav-item" data-page="dashboard"><span class="nav-icon">&#x1F4CA;</span> Dashboard</a>
+    <div class="nav-section">Gestion</div>
+    <a class="nav-item" data-page="rutas"><span class="nav-icon">&#x1F6E3;&#xFE0F;</span> Rutas</a>
+    <a class="nav-item" data-page="unidades"><span class="nav-icon">&#x1F68C;</span> Unidades</a>
+    <a class="nav-item" data-page="conductores"><span class="nav-icon">&#x1F464;</span> Conductores</a>
+    <a class="nav-item" data-page="asignaciones"><span class="nav-icon">&#x1F517;</span> Asignaciones</a>
+    <div class="nav-section">Operaciones</div>
+    <a class="nav-item" data-page="monitoreo"><span class="nav-icon">&#x1F5FA;&#xFE0F;</span> Monitoreo GPS</a>
+    <a class="nav-item" data-page="reportes"><span class="nav-icon">&#x1F4C8;</span> Reportes</a>
+    <div class="nav-section">Admin</div>
+    <a class="nav-item" data-page="usuarios"><span class="nav-icon">&#x1F465;</span> Usuarios</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="avatar" id="sidebarAvatar">A</div>
+      <div class="user-info"><strong id="sidebarName">Admin</strong><small id="sidebarRol">admin</small></div>
+    </div>
+    <button id="logoutBtn" class="btn btn-danger btn-sm" style="width:100%;margin-top:10px">Cerrar sesion</button>
+  </div>
+</aside>
+
+<div class="main-content">
+  <div class="topbar">
+    <div class="topbar-title">Gestion de Rutas</div>
+    <div class="topbar-right"><div class="topbar-avatar" id="topbarAvatar">A</div></div>
+  </div>
+  <div class="page-content">
+    <div class="page-header">
+      <div><h1>Rutas</h1><p>Administra las rutas y horarios del sistema Transmetro</p></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-secondary" onclick="importarExcel()">&#x1F4E5; Importar Excel</button>
+        <button class="btn btn-primary" onclick="abrirModal()">+ Nueva Ruta</button>
+      </div>
+    </div>
+
+    <div class="card" id="listaCard">
+      <div class="card-header">
+        <h3>Lista de Rutas</h3>
+        <input type="text" class="search-input" id="searchInput" placeholder="Buscar ruta..." oninput="filtrar(this.value)" style="width:250px">
+      </div>
+      <div class="card-body">
+        <div id="rutasGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+          <div class="loading"><div class="spinner"></div> Cargando rutas...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="detalleCard" class="card" style="display:none;margin-top:18px">
+      <div class="card-header">
+        <h3 id="detalleTitle">Detalle de Ruta</h3>
+        <button class="btn btn-secondary btn-sm" onclick="cerrarDetalle()">x Cerrar</button>
+      </div>
+      <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div>
+          <h4 style="margin-bottom:12px;font-size:14px;color:#6b7280">PARADAS</h4>
+          <div id="detalleParadas" style="max-height:350px;overflow-y:auto"></div>
+        </div>
+        <div>
+          <h4 style="margin-bottom:12px;font-size:14px;color:#6b7280">HORARIOS</h4>
+          <div id="detalleHorarios"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <h3 id="modalTitle">Nueva Ruta</h3>
+      <button class="modal-close" onclick="cerrarModal()">x</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Nombre *</label><input class="form-control" id="fNombre" placeholder="Linea 12"></div>
+        <div class="form-group"><label class="form-label">Numero *</label><input class="form-control" id="fNumero" placeholder="12"></div>
+        <div class="form-group"><label class="form-label">Color</label><input class="form-control" type="color" id="fColor" value="#0F0DFF"></div>
+        <div class="form-group"><label class="form-label">Estado</label><select class="form-control" id="fEstado"><option value="activa">Activa</option><option value="inactiva">Inactiva</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">Descripcion</label><textarea class="form-control" id="fDesc" rows="2" placeholder="Descripcion de la ruta..."></textarea></div>
+      <div style="border-top:1px solid var(--border);margin:16px 0;padding-top:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <label class="form-label" style="margin:0">Horarios</label>
+          <button class="btn btn-sm btn-success" onclick="addHorario()">+ Agregar Horario</button>
+        </div>
+        <div id="horariosContainer"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardar()">Guardar Ruta</button>
+    </div>
+  </div>
+</div>
+
+<script>
+setupSidebar('rutas');
+var rutas = [], loadId = 0;
+var horarioCount = 0;
+
+async function cargar() {
+  var mid = ++loadId;
+  document.getElementById('rutasGrid').innerHTML = '<div style="text-align:center;padding:40px"><div class="spinner"></div></div>';
+  try {
+    var data = await api.get('/rutas');
+    if (mid !== loadId) return;
+    rutas = data;
+    renderGrid(rutas);
+  } catch(e) {
+    if (mid !== loadId) return;
+    document.getElementById('rutasGrid').innerHTML = '<div style="text-align:center;color:#ef4444;padding:40px">⚠️ Error al cargar rutas. Verifica que el servidor esté activo.</div>';
+  }
+}
+
+function renderGrid(data) {
+  var g = document.getElementById('rutasGrid');
+  if (!data.length) { g.innerHTML = '<div class="empty-state"><div class="empty-icon">&#x1F6E3;&#xFE0F;</div><h3>No hay rutas registradas</h3></div>'; return; }
+  g.innerHTML = data.map(function(r) {
+    var dot = '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:' + (r.color||'#666') + ';margin-right:6px"></span>';
+    return '<div class="card" style="cursor:pointer;transition:box-shadow .2s;border-top:4px solid '+(r.color||'#666')+'" onclick="verDetalle('+r.id+')" onmouseover="this.style.boxShadow=\'0 8px 24px rgba(0,0,0,0.15)\'" onmouseout="this.style.boxShadow=\'\'"><div style="padding:16px"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-weight:700;font-size:16px;margin-bottom:4px">'+dot+r.nombre+'</div><div style="color:#6b7280;font-size:12px">'+(r.descripcion||'Sin descripcion')+'</div></div>'+badgeEstadoRuta(r.estado)+'</div><div style="margin-top:12px;display:flex;gap:10px;font-size:12px;color:#9ca3af"><span>&#x1F6D1; '+(r.paradas?r.paradas.length:0)+' paradas</span><span>&#x1F55B; '+(r.horarios?r.horarios.length:0)+' horarios</span></div><div style="margin-top:10px;display:flex;gap:6px"><button class="btn btn-sm btn-outline" onclick="event.stopPropagation();editar('+r.id+')">Editar</button><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();eliminar('+r.id+')">Eliminar</button></div></div></div>';
+  }).join('');
+}
+
+function filtrar(q) {
+  q = q.toLowerCase();
+  renderGrid(rutas.filter(function(r) { return !q || r.nombre.toLowerCase().includes(q) || r.numero.includes(q); }));
+}
+
+function verDetalle(id) {
+  var r = rutas.find(function(x) { return x.id === id; });
+  if (!r) return;
+  document.getElementById('detalleTitle').textContent = r.nombre + ' - Detalle';
+  var paradas = document.getElementById('detalleParadas');
+  if (r.paradas && r.paradas.length) {
+    paradas.innerHTML = r.paradas.map(function(p, i) {
+      return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><div style="width:24px;height:24px;border-radius:50%;background:'+(r.color||'#666')+';color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">'+(i+1)+'</div><span style="font-size:13px">'+p.nombre+'</span></div>';
+    }).join('');
+  } else { paradas.innerHTML = '<p style="color:#9ca3af;font-size:13px">Sin paradas registradas</p>'; }
+  var horarios = document.getElementById('detalleHorarios');
+  if (r.horarios && r.horarios.length) {
+    horarios.innerHTML = r.horarios.map(function(h) {
+      return '<div style="padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px"><div style="font-weight:600;font-size:13px">'+h.hora_inicio+' - '+h.hora_fin+'</div><div style="color:#6b7280;font-size:12px;margin-top:4px">Cada '+h.frecuencia_minutos+' min | '+h.dias+'</div></div>';
+    }).join('');
+  } else { horarios.innerHTML = '<p style="color:#9ca3af;font-size:13px">Sin horarios registrados</p>'; }
+  document.getElementById('detalleCard').style.display = 'block';
+  document.getElementById('detalleCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function cerrarDetalle() { document.getElementById('detalleCard').style.display = 'none'; }
+
+function addHorario() {
+  horarioCount++;
+  var c = document.getElementById('horariosContainer');
+  var div = document.createElement('div');
+  div.id = 'h_' + horarioCount;
+  div.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px;padding:10px;background:#f9fafb;border-radius:8px';
+  div.innerHTML = '<div><label class="form-label" style="font-size:11px">Inicio</label><input type="time" class="form-control" id="hi_'+horarioCount+'" value="05:00"></div><div><label class="form-label" style="font-size:11px">Fin</label><input type="time" class="form-control" id="hf_'+horarioCount+'" value="22:00"></div><div><label class="form-label" style="font-size:11px">Frec.(min)</label><input type="number" class="form-control" id="hfr_'+horarioCount+'" value="15" min="1"></div><div><label class="form-label" style="font-size:11px">Dias</label><input class="form-control" id="hd_'+horarioCount+'" value="Lunes a Viernes"></div><button class="btn btn-sm btn-danger" onclick="document.getElementById(\'h_'+horarioCount+'\').remove()" style="margin-bottom:0">x</button>';
+  c.appendChild(div);
+}
+
+function abrirModal(d) {
+  document.getElementById('modalTitle').textContent = d ? 'Editar Ruta' : 'Nueva Ruta';
+  document.getElementById('editId').value = d ? d.id : '';
+  document.getElementById('fNombre').value = d ? d.nombre : '';
+  document.getElementById('fNumero').value = d ? d.numero : '';
+  document.getElementById('fColor').value = d ? d.color : '#0F0DFF';
+  document.getElementById('fDesc').value = d ? d.descripcion||'' : '';
+  document.getElementById('fEstado').value = d ? d.estado : 'activa';
+  document.getElementById('horariosContainer').innerHTML = '';
+  horarioCount = 0;
+  if (d && d.horarios) { addHorario(); } else { addHorario(); }
+  document.getElementById('modalOverlay').classList.add('active');
+}
+function cerrarModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+
+function editar(id) { var r = rutas.find(function(x) { return x.id === id; }); if (r) abrirModal(r); }
+
+async function guardar() {
+  var id = document.getElementById('editId').value;
+  var horarios = [];
+  document.querySelectorAll('[id^="hi_"]').forEach(function(el) {
+    var n = el.id.split('_')[1];
+    horarios.push({ hora_inicio: el.value, hora_fin: document.getElementById('hf_'+n).value, frecuencia_minutos: document.getElementById('hfr_'+n).value, dias: document.getElementById('hd_'+n).value });
+  });
+  var data = { nombre: document.getElementById('fNombre').value, numero: document.getElementById('fNumero').value, color: document.getElementById('fColor').value, descripcion: document.getElementById('fDesc').value, estado: document.getElementById('fEstado').value, horarios: horarios };
+  try {
+    if (id) await api.put('/rutas/'+id, data); else await api.post('/rutas', data);
+    toast(id ? 'Ruta actualizada' : 'Ruta creada', 'success');
+    cerrarModal(); await cargar();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function eliminar(id) {
+  if (!confirm('Eliminar esta ruta y todas sus paradas?')) return;
+  try { await api.del('/rutas/'+id); toast('Ruta eliminada', 'success'); await cargar(); } catch(e) { toast(e.message, 'error'); }
+}
+
+async function importarExcel() {
+  try { await api.post('/rutas/importar/excel', {}); toast('Excel importado exitosamente', 'success'); await cargar(); } catch(e) { toast(e.message, 'error'); }
+}
+
+cargar();
+</script>
+</body>
+</html>

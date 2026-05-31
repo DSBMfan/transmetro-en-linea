@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockups - Transmetro en Línea</title>
+<style>
+:root {
+  --verde: #86ED5A; --azul: #0F0DFF; --sidebar: #0d0d2b;
+  --border: #e5e7eb; --bg: #f4f6fb; --text: #1e1e2e; --light: #6b7280;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: white; }
+
+/* NAV */
+.nav { background: #0d0d2b; padding: 14px 28px; display:flex; align-items:center; gap:16px; position:sticky; top:0; z-index:100; border-bottom:1px solid rgba(255,255,255,0.1); }
+.nav h1 { font-size:15px; font-weight:700; color: var(--verde); }
+.nav-tabs { display:flex; gap:6px; flex-wrap:wrap; }
+.tab { padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.6); transition:all .2s; }
+.tab:hover, .tab.active { background:var(--azul); color:white; border-color:var(--azul); }
+
+/* SCREENS */
+.screens { padding: 24px; }
+.screen { display:none; }
+.screen.active { display:block; }
+.screen-label { text-align:center; color:rgba(255,255,255,0.4); font-size:12px; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px; }
+
+/* BROWSER FRAME */
+.browser { background:white; border-radius:12px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.5); max-width:1280px; margin:0 auto; }
+.browser-bar { background:#f0f0f0; padding:10px 16px; display:flex; align-items:center; gap:10px; }
+.browser-dots { display:flex; gap:6px; }
+.dot { width:12px; height:12px; border-radius:50%; }
+.dot-r { background:#ff5f57; } .dot-y { background:#febc2e; } .dot-g { background:#28c840; }
+.browser-url { flex:1; background:white; border-radius:6px; padding:5px 12px; font-size:12px; color:#666; border:1px solid #ddd; }
+
+/* APP FRAME */
+.app { display:flex; min-height:600px; background:var(--bg); }
+
+/* SIDEBAR */
+.sidebar { width:240px; background:var(--sidebar); display:flex; flex-direction:column; flex-shrink:0; }
+.s-logo { padding:18px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:10px; }
+.s-logo-icon { width:36px; height:36px; background:var(--azul); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+.s-logo-text h2 { color:white; font-size:11px; font-weight:700; }
+.s-logo-text span { color:var(--verde); font-size:10px; }
+.s-nav { padding:8px 0; flex:1; }
+.s-section { padding:8px 14px 3px; font-size:9px; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:1px; }
+.s-item { display:flex; align-items:center; gap:10px; padding:9px 16px; color:rgba(255,255,255,0.6); font-size:12px; border-left:3px solid transparent; cursor:pointer; }
+.s-item:hover { background:rgba(255,255,255,0.05); }
+.s-item.active { background:rgba(15,13,255,0.25); color:white; border-left-color:var(--verde); }
+.s-icon { font-size:14px; min-width:18px; text-align:center; }
+.s-footer { padding:12px 14px; border-top:1px solid rgba(255,255,255,0.08); }
+.s-user { display:flex; align-items:center; gap:8px; }
+.s-avatar { width:30px; height:30px; background:var(--azul); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:700; }
+.s-user-info strong { color:white; font-size:11px; display:block; }
+.s-user-info small { color:rgba(255,255,255,0.4); font-size:10px; }
+
+/* MAIN */
+.main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.topbar { background:white; padding:0 20px; height:54px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+.topbar-title { font-size:15px; font-weight:700; color:var(--text); }
+.topbar-right { display:flex; align-items:center; gap:10px; }
+.t-avatar { width:30px; height:30px; background:var(--azul); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:12px; font-weight:700; }
+
+/* PAGE */
+.page { padding:20px; flex:1; overflow-y:auto; }
+.p-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px; }
+.p-header h1 { font-size:18px; font-weight:700; color:var(--text); }
+.p-header p { color:var(--light); font-size:12px; margin-top:2px; }
+
+/* CARDS */
+.card { background:white; border-radius:10px; border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.06); overflow:hidden; }
+.card-header { padding:12px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.card-header h3 { font-size:13px; font-weight:600; color:var(--text); }
+.card-body { padding:16px; }
+
+/* STATS */
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
+.stat { background:white; border-radius:10px; padding:14px; border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.06); display:flex; align-items:center; gap:12px; }
+.stat-ic { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+.ic-verde { background:rgba(134,237,90,0.12); } .ic-azul { background:rgba(15,13,255,0.08); }
+.ic-naranja { background:rgba(245,158,11,0.1); } .ic-rojo { background:rgba(239,68,68,0.1); }
+.stat-v { font-size:22px; font-weight:700; color:var(--text); }
+.stat-l { font-size:11px; color:var(--light); }
+
+/* TABLE */
+.table-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; }
+thead th { background:var(--bg); padding:9px 12px; text-align:left; font-size:10.5px; font-weight:600; color:var(--light); text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid var(--border); }
+tbody tr { border-bottom:1px solid var(--border); }
+tbody tr:last-child { border-bottom:none; }
+tbody tr:hover { background:#f8f9ff; }
+tbody td { padding:10px 12px; font-size:12.5px; color:var(--text); }
+
+/* BADGES */
+.badge { display:inline-flex; align-items:center; padding:2px 8px; border-radius:20px; font-size:10.5px; font-weight:600; }
+.b-green { background:rgba(16,185,129,0.1); color:#059669; }
+.b-red { background:rgba(239,68,68,0.1); color:#dc2626; }
+.b-yellow { background:rgba(245,158,11,0.1); color:#d97706; }
+.b-blue { background:rgba(15,13,255,0.1); color:var(--azul); }
+.b-gray { background:#f3f4f6; color:#6b7280; }
+
+/* BUTTONS */
+.btn { display:inline-flex; align-items:center; gap:5px; padding:7px 13px; border-radius:7px; font-size:12px; font-weight:500; cursor:pointer; border:none; }
+.btn-primary { background:var(--azul); color:white; }
+.btn-success { background:var(--verde); color:#1a1a1a; }
+.btn-sm { padding:4px 9px; font-size:11px; border-radius:5px; }
+.btn-outline { background:transparent; border:1.5px solid var(--azul); color:var(--azul); }
+.btn-danger { background:#ef4444; color:white; }
+
+/* GRID */
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+.grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+
+/* FORM */
+.form-group { margin-bottom:12px; }
+.form-label { font-size:11.5px; font-weight:600; color:var(--text); display:block; margin-bottom:4px; }
+.form-input { width:100%; padding:8px 10px; border:1.5px solid var(--border); border-radius:7px; font-size:12.5px; color:var(--text); }
+.form-input:focus { border-color:var(--azul); outline:none; }
+
+/* MAP */
+.map-container { height:480px; background:linear-gradient(135deg,#e8f4f8 0%,#d4e9f7 100%); border-radius:8px; position:relative; overflow:hidden; }
+.map-bg { width:100%; height:100%; object-fit:cover; }
+.map-overlay { position:absolute; inset:0; }
+.route-line { position:absolute; background:transparent; }
+
+/* ROUTE CARDS */
+.route-card { border-radius:10px; padding:14px; border:1px solid var(--border); cursor:pointer; transition:all .2s; border-top:4px solid; }
+.route-card:hover { box-shadow:0 6px 20px rgba(0,0,0,0.1); }
+
+/* GPS PANEL */
+.gps-grid { display:grid; grid-template-columns:260px 1fr; gap:14px; height:520px; }
+.unit-list { overflow-y:auto; display:flex; flex-direction:column; gap:8px; }
+.unit-item { padding:10px; border:1px solid var(--border); border-radius:8px; cursor:pointer; background:white; }
+.unit-item.active { border-color:var(--azul); background:rgba(15,13,255,0.04); }
+.unit-num { font-weight:700; font-size:13px; color:var(--text); }
+.unit-info { font-size:11px; color:var(--light); margin-top:2px; }
+
+/* MAP MOCK */
+.map-mock { border-radius:10px; overflow:hidden; height:100%; background:#e8f4f8; position:relative; }
+.osm-map { width:100%; height:100%; }
+
+/* REPORT EXPORT CARDS */
+.export-card { border:1px solid var(--border); border-radius:10px; padding:16px; background:white; }
+.export-icon { font-size:28px; margin-bottom:8px; }
+.export-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:4px; }
+.export-desc { font-size:11px; color:var(--light); margin-bottom:12px; }
+.export-btns { display:flex; gap:8px; }
+
+/* CHART MOCK */
+.chart-mock { display:flex; align-items:flex-end; gap:8px; height:160px; padding:10px 0; }
+.bar { background:var(--azul); border-radius:4px 4px 0 0; flex:1; transition:.3s; }
+.bar:nth-child(even) { background:var(--verde); }
+.donut-mock { width:140px; height:140px; border-radius:50%; background:conic-gradient(var(--verde) 0% 55%, var(--warning,#f59e0b) 55% 75%, #ef4444 75% 100%); margin:0 auto; position:relative; }
+.donut-hole { position:absolute; inset:25%; background:white; border-radius:50%; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <h1>🚌 TRANSMETRO EN LÍNEA — Mockups</h1>
+  <div class="nav-tabs">
+    <div class="tab active" onclick="show('login')">🔐 Login</div>
+    <div class="tab" onclick="show('dashboard')">📊 Dashboard</div>
+    <div class="tab" onclick="show('rutas')">🛣️ Rutas</div>
+    <div class="tab" onclick="show('unidades')">🚌 Unidades</div>
+    <div class="tab" onclick="show('conductores')">👤 Conductores</div>
+    <div class="tab" onclick="show('asignaciones')">🔗 Asignaciones</div>
+    <div class="tab" onclick="show('monitoreo')">🗺️ GPS</div>
+    <div class="tab" onclick="show('reportes')">📈 Reportes</div>
+    <div class="tab" onclick="show('usuarios')">👥 Usuarios</div>
+  </div>
+</div>
+
+<div class="screens">
+
+<!-- ===================== LOGIN ===================== -->
+<div class="screen active" id="s-login">
+  <div class="screen-label">Pantalla de Inicio de Sesión</div>
+  <div class="browser">
+    <div class="browser-bar"><div class="browser-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><div class="browser-url">localhost:3000</div></div>
+    <div style="display:flex;min-height:580px">
+      <div style="flex:1;background:linear-gradient(135deg,#0d0d2b 0%,#1a1a6e 100%);display:flex;align-items:center;justify-content:center;padding:40px">
+        <div style="text-align:center;color:white">
+          <div style="font-size:64px;margin-bottom:16px">🚌</div>
+          <h1 style="font-size:28px;font-weight:800;margin-bottom:8px">TRANSMETRO<br><span style="color:#86ED5A">EN LÍNEA</span></h1>
+          <p style="color:rgba(255,255,255,0.55);font-size:14px">Sistema de Gestión de<br>Transporte Masivo</p>
+          <div style="margin-top:24px;display:flex;flex-direction:column;gap:10px">
+            <div style="background:rgba(134,237,90,0.1);border:1px solid rgba(134,237,90,0.3);border-radius:8px;padding:10px 16px;font-size:12px;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:8px"><span>🛣️</span> 8 Líneas de transporte</div>
+            <div style="background:rgba(15,13,255,0.2);border:1px solid rgba(15,13,255,0.3);border-radius:8px;padding:10px 16px;font-size:12px;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:8px"><span>🗺️</span> Monitoreo GPS en tiempo real</div>
+            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 16px;font-size:12px;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:8px"><span>📊</span> Reportes y estadísticas</div>
+          </div>
+        </div>
+      </div>
+      <div style="flex:1;background:white;display:flex;align-items:center;justify-content:center;padding:40px;border-radius:40px 0 0 40px">
+        <div style="width:100%;max-width:360px">
+          <h2 style="font-size:22px;font-weight:700;color:#1e1e2e;margin-bottom:6px">Bienvenido</h2>
+          <p style="color:#6b7280;font-size:13px;margin-bottom:24px">Ingresa tus credenciales para continuar</p>
+          <div class="form-group"><label class="form-label">Correo electrónico</label><input class="form-input" value="admin@transmetro.gt" style="border-color:#0F0DFF;box-shadow:0 0 0 3px rgba(15,13,255,0.07)"></div>
+          <div class="form-group"><label class="form-label">Contraseña</label><input class="form-input" type="password" value="password" placeholder="••••••••"></div>
+          <button class="btn btn-primary" style="width:100%;padding:11px;font-size:14px;justify-content:center;margin-top:8px;border-radius:8px">Iniciar Sesión</button>
+          <p style="text-align:center;color:#9ca3af;font-size:11px;margin-top:20px">Transmetro en Línea v1.0 © 2024</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== DASHBOARD ===================== -->
+<div class="screen" id="s-dashboard">
+  <div class="screen-label">Dashboard Principal</div>
+  <div class="browser">
+    <div class="browser-bar"><div class="browser-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><div class="browser-url">localhost:3000/dashboard.html</div></div>
+    <div class="app">
+      <div class="sidebar">
+        <div class="s-logo"><div class="s-logo-icon">🚌</div><div class="s-logo-text"><h2>TRANSMETRO EN LÍNEA</h2><span>Sistema de Gestión</span></div></div>
+        <div class="s-nav">
+          <div class="s-section">Principal</div>
+          <div class="s-item active"><span class="s-icon">📊</span> Dashboard</div>
+          <div class="s-section">Gestión</div>
+          <div class="s-item"><span class="s-icon">🛣️</span> Rutas</div>
+          <div class="s-item"><span class="s-icon">🚌</span> Unidades</div>
+          <div class="s-item"><span class="s-icon">👤</span> Conductores</div>
+          <div class="s-item"><span class="s-icon">🔗</span> Asignaciones</div>
+          <div class="s-section">Operaciones</div>
+          <div class="s-item"><span class="s-icon">🗺️</span> Monitoreo GPS</div>
+          <div class="s-item"><span class="s-icon">📈</span> Reportes</div>
+          <div class="s-section">Admin</div>
+          <div class="s-item"><span class="s-icon">👥</span> Usuarios</div>
+        </div>
+        <div class="s-footer"><div class="s-user"><div class="s-avatar">A</div><div class="s-user-info"><strong>Administrador</strong><small>admin</small></div></div></div>
+      </div>
+      <div class="main">
+        <div class="topbar"><div class="topbar-title">📊 Dashboard</div><div class="topbar-right"><span style="font-size:11px;color:#9ca3af">Miércoles, 28 mayo 2025</span><div class="t-avatar">A</div></div></div>
+        <div class="page">
+          <div class="p-header"><div><h1>Panel Principal</h1><p>Resumen general del sistema Transmetro en Línea</p></div></div>
+          <div class="stats">
+            <div class="stat"><div class="stat-ic ic-azul">🚌</div><div><div class="stat-v">6</div><div class="stat-l">Total Unidades</div></div></div>
+            <div class="stat"><div class="stat-ic ic-verde">✅</div><div><div class="stat-v" style="color:#059669">4</div><div class="stat-l">En Servicio</div></div></div>
+            <div class="stat"><div class="stat-ic ic-naranja">🔧</div><div><div class="stat-v" style="color:#d97706">1</div><div class="stat-l">Mantenimiento</div></div></div>
+            <div class="stat"><div class="stat-ic ic-rojo">❌</div><div><div class="stat-v" style="color:#dc2626">1</div><div class="stat-l">Fuera Servicio</div></div></div>
+          </div>
+          <div class="stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:14px">
+            <div class="stat"><div class="stat-ic ic-azul">🛣️</div><div><div class="stat-v">8</div><div class="stat-l">Rutas Activas</div></div></div>
+            <div class="stat"><div class="stat-ic ic-verde">👤</div><div><div class="stat-v">4</div><div class="stat-l">Conductores</div></div></div>
+            <div class="stat"><div class="stat-ic ic-azul">🔗</div><div><div class="stat-v">3</div><div class="stat-l">Asignaciones Activas</div></div></div>
+          </div>
+          <div class="grid2" style="margin-bottom:14px">
+            <div class="card">
+              <div class="card-header"><h3>Estado de Flota</h3></div>
+              <div class="card-body" style="display:flex;align-items:center;justify-content:center;gap:20px;padding:20px">
+                <div style="position:relative;width:120px;height:120px">
+                  <div style="width:120px;height:120px;border-radius:50%;background:conic-gradient(#86ED5A 0% 67%,#f59e0b 67% 83%,#ef4444 83% 100%)"></div>
+                  <div style="position:absolute;inset:20%;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#1e1e2e">6</div>
+                </div>
+                <div style="font-size:12px">
+                  <div style="margin-bottom:6px;display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#86ED5A;display:inline-block"></span> En Servicio (4)</div>
+                  <div style="margin-bottom:6px;display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;display:inline-block"></span> Mantenimiento (1)</div>
+                  <div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#ef4444;display:inline-block"></span> Fuera Servicio (1)</div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><h3>Accesos Rápidos</h3></div>
+              <div class="card-body">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                  <button class="btn btn-primary" style="justify-content:center;font-size:12px;border-radius:8px">🛣️ Ver Rutas</button>
+                  <button class="btn btn-success" style="justify-content:center;font-size:12px;border-radius:8px">🚌 Unidades</button>
+                  <button class="btn" style="background:#f3f4f6;color:#374151;justify-content:center;font-size:12px;border-radius:8px">👤 Conductores</button>
+                  <button class="btn btn-outline" style="justify-content:center;font-size:12px;border-radius:8px">🗺️ Mapa GPS</button>
+                  <button class="btn" style="background:#f59e0b;color:white;justify-content:center;font-size:12px;border-radius:8px">🔗 Asignaciones</button>
+                  <button class="btn" style="background:#f3f4f6;color:#374151;justify-content:center;font-size:12px;border-radius:8px">📈 Reportes</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Asignaciones Activas Recientes</h3></div>
+            <div class="card-body" style="padding:0">
+              <div class="table-wrap"><table>
+                <thead><tr><th>Unidad</th><th>Ruta</th><th>Conductor</th><th>Desde</th><th>Estado</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>BRT-001</strong></td><td><span style="background:#FF660022;color:#FF6600;padding:2px 8px;border-radius:10px;font-size:11px">Línea 12</span></td><td>Carlos Mendoza</td><td>2025-05-01</td><td><span class="badge b-green">Activa</span></td></tr>
+                  <tr><td><strong>BRT-002</strong></td><td><span style="background:#22882222;color:#228822;padding:2px 8px;border-radius:10px;font-size:11px">Línea 13</span></td><td>María García</td><td>2025-05-01</td><td><span class="badge b-green">Activa</span></td></tr>
+                  <tr><td><strong>BRT-004</strong></td><td><span style="background:#8B008B22;color:#8B008B;padding:2px 8px;border-radius:10px;font-size:11px">Línea 2</span></td><td>Juan López</td><td>2025-05-10</td><td><span class="badge b-green">Activa</span></td></tr>
+                </tbody>
+              </table></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== RUTAS ===================== -->
+<div class="screen" id="s-rutas">
+  <div class="screen-label">Gestión de Rutas</div>
+  <div class="browser">
+    <div class="browser-bar"><div class="browser-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><div class="browser-url">localhost:3000/rutas.html</div></div>
+    <div class="app">
+      <div class="sidebar">
+        <div class="s-logo"><div class="s-logo-icon">🚌</div><div class="s-logo-text"><h2>TRANSMETRO EN LÍNEA</h2><span>Sistema de Gestión</span></div></div>
+        <div class="s-nav">
+          <div class="s-section">Principal</div><div class="s-item"><span class="s-icon">📊</span> Dashboard</div>
+          <div class="s-section">Gestión</div>
+          <div class="s-item active"><span class="s-icon">🛣️</span> Rutas</div>
+          <div class="s-item"><span class="s-icon">🚌</span> Unidades</div><div class="s-item"><span class="s-icon">👤</span> Conductores</div><div class="s-item"><span class="s-icon">🔗</span> Asignaciones</div>
+          <div class="s-section">Operaciones</div><div class="s-item"><span class="s-icon">🗺️</span> Monitoreo GPS</div><div class="s-item"><span class="s-icon">📈</span> Reportes</div>
+        </div>
+        <div class="s-footer"><div class="s-user"><div class="s-avatar">A</div><div class="s-user-info"><strong>Administrador</strong><small>admin</small></div></div></div>
+      </div>
+      <div class="main">
+        <div class="topbar"><div class="topbar-title">Gestión de Rutas</div><div class="topbar-right"><div class="t-avatar">A</div></div></div>
+        <div class="page">
+          <div class="p-header"><div><h1>Rutas</h1><p>Administra las líneas y horarios del sistema</p></div><div style="display:flex;gap:8px"><button class="btn" style="background:#f3f4f6;color:#374151;font-size:12px">📥 Importar Excel</button><button class="btn btn-primary" style="font-size:12px">+ Nueva Ruta</button></div></div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+            <div class="route-card" style="border-top-color:#808080"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><span style="font-weight:700;font-size:13px">Línea 1</span><span class="badge b-green">Activa</span></div><p style="font-size:11px;color:#6b7280;margin-bottom:10px">Zona occidental - San Sebastián</p><div style="font-size:11px;color:#9ca3af;margin-bottom:10px">🛑 17 paradas &nbsp; 🕐 2 horarios</div><div style="display:flex;gap:6px"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Eliminar</button></div></div>
+            <div class="route-card" style="border-top-color:#8B008B"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><span style="font-weight:700;font-size:13px">Línea 2</span><span class="badge b-green">Activa</span></div><p style="font-size:11px;color:#6b7280;margin-bottom:10px">Norte - Hipódromo del Norte</p><div style="font-size:11px;color:#9ca3af;margin-bottom:10px">🛑 18 paradas &nbsp; 🕐 2 horarios</div><div style="display:flex;gap:6px"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Eliminar</button></div></div>
+            <div class="route-card" style="border-top-color:#DAA520"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><span style="font-weight:700;font-size:13px">Línea 6</span><span class="badge b-green">Activa</span></div><p style="font-size:11px;color:#6b7280;margin-bottom:10px">Oriental - Proyectos</p><div style="font-size:11px;color:#9ca3af;margin-bottom:10px">🛑 15 paradas &nbsp; 🕐 1 horario</div><div style="display:flex;gap:6px"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Eliminar</button></div></div>
+            <div class="route-card" style="border-top-color:#FF6600"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><span style="font-weight:700;font-size:13px">Línea 12</span><span class="badge b-green">Activa</span></div><p style="font-size:11px;color:#6b7280;margin-bottom:10px">Sur - Centra Sur</p><div style="font-size:11px;color:#9ca3af;margin-bottom:10px">🛑 18 paradas &nbsp; 🕐 2 horarios</div><div style="display:flex;gap:6px"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Eliminar</button></div></div>
+            <div class="route-card" style="border-top-color:#228B22"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><span style="font-weight:700;font-size:13px">Línea 13</span><span class="badge b-green">Activa</span></div><p style="font-size:11px;color:#6b7280;margin-bottom:10px">Sur - Plaza Berlín</p><div style="font-size:11px;color:#9ca3af;margin-bottom:10px">🛑 23 paradas &nbsp; 🕐 2 horarios</div><div style="display:flex;gap:6px"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Eliminar</button></div></div>
+            <div class="route-card" style="border-top-color:#00BFFF"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><span style="font-weight:700;font-size:13px">Línea 18</span><span class="badge b-green">Activa</span></div><p style="font-size:11px;color:#6b7280;margin-bottom:10px">San Rafael - Paraíso</p><div style="font-size:11px;color:#9ca3af;margin-bottom:10px">🛑 10 paradas &nbsp; 🕐 1 horario</div><div style="display:flex;gap:6px"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Eliminar</button></div></div>
+            <div class="route-card" style="border-top-color:#000080"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><span style="font-weight:700;font-size:13px">Ruta 5</span><span class="badge b-green">Activa</span></div><p style="font-size:11px;color:#6b7280;margin-bottom:10px">Central - Parque Colón</p><div style="font-size:11px;color:#9ca3af;margin-bottom:10px">🛑 7 paradas &nbsp; 🕐 1 horario</div><div style="display:flex;gap:6px"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Eliminar</button></div></div>
+            <div class="route-card" style="border-top-color:#696969"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><span style="font-weight:700;font-size:13px">Línea 7</span><span class="badge b-green">Activa</span></div><p style="font-size:11px;color:#6b7280;margin-bottom:10px">USAC Periférico</p><div style="font-size:11px;color:#9ca3af;margin-bottom:10px">🛑 6 paradas &nbsp; 🕐 1 horario</div><div style="display:flex;gap:6px"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Eliminar</button></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== UNIDADES ===================== -->
+<div class="screen" id="s-unidades">
+  <div class="screen-label">Gestión de Unidades (Buses)</div>
+  <div class="browser">
+    <div class="browser-bar"><div class="browser-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><div class="browser-url">localhost:3000/unidades.html</div></div>
+    <div class="app">
+      <div class="sidebar">
+        <div class="s-logo"><div class="s-logo-icon">🚌</div><div class="s-logo-text"><h2>TRANSMETRO EN LÍNEA</h2><span>Sistema de Gestión</span></div></div>
+        <div class="s-nav"><div class="s-section">Principal</div><div class="s-item"><span class="s-icon">📊</span> Dashboard</div><div class="s-section">Gestión</div><div class="s-item"><span class="s-icon">🛣️</span> Rutas</div><div class="s-item active"><span class="s-icon">🚌</span> Unidades</div><div class="s-item"><span class="s-icon">👤</span> Conductores</div><div class="s-item"><span class="s-icon">🔗</span> Asignaciones</div><div class="s-section">Operaciones</div><div class="s-item"><span class="s-icon">🗺️</span> Monitoreo GPS</div><div class="s-item"><span class="s-icon">📈</span> Reportes</div></div>
+        <div class="s-footer"><div class="s-user"><div class="s-avatar">A</div><div class="s-user-info"><strong>Administrador</strong><small>admin</small></div></div></div>
+      </div>
+      <div class="main">
+        <div class="topbar"><div class="topbar-title">Gestión de Unidades</div><div class="topbar-right"><div class="t-avatar">A</div></div></div>
+        <div class="page">
+          <div class="p-header"><div><h1>Unidades</h1><p>Registro y control de buses del sistema</p></div><button class="btn btn-primary" style="font-size:12px">+ Nueva Unidad</button></div>
+          <div class="stats" style="margin-bottom:14px">
+            <div class="stat"><div class="stat-ic ic-azul">🚌</div><div><div class="stat-v">6</div><div class="stat-l">Total</div></div></div>
+            <div class="stat"><div class="stat-ic ic-verde">✅</div><div><div class="stat-v" style="color:#059669">4</div><div class="stat-l">En Servicio</div></div></div>
+            <div class="stat"><div class="stat-ic ic-naranja">🔧</div><div><div class="stat-v" style="color:#d97706">1</div><div class="stat-l">Mantenimiento</div></div></div>
+            <div class="stat"><div class="stat-ic ic-rojo">❌</div><div><div class="stat-v" style="color:#dc2626">1</div><div class="stat-l">Fuera Servicio</div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Lista de Unidades</h3><div style="display:flex;gap:8px"><input class="form-input" placeholder="Buscar unidad..." style="width:200px;padding:6px 10px;font-size:12px"><select class="form-input" style="width:160px;padding:6px 10px;font-size:12px"><option>Todos los estados</option></select></div></div>
+            <div class="card-body" style="padding:0">
+              <div class="table-wrap"><table>
+                <thead><tr><th>#</th><th>Número</th><th>Placa</th><th>Modelo</th><th>Año</th><th>Capacidad</th><th>Conductor</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody>
+                  <tr><td>1</td><td><strong>BRT-001</strong></td><td>GTM-001</td><td>Volvo 7900</td><td>2020</td><td>80</td><td>Carlos Mendoza</td><td><span class="badge b-green">● En Servicio</span></td><td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Eliminar</button></div></td></tr>
+                  <tr><td>2</td><td><strong>BRT-002</strong></td><td>GTM-002</td><td>Volvo 7900</td><td>2020</td><td>80</td><td>María García</td><td><span class="badge b-green">● En Servicio</span></td><td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Eliminar</button></div></td></tr>
+                  <tr><td>3</td><td><strong>BRT-003</strong></td><td>GTM-003</td><td>Mercedes Citaro</td><td>2019</td><td>75</td><td><span style="color:#9ca3af">Sin asignar</span></td><td><span class="badge b-yellow">● Mantenimiento</span></td><td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Eliminar</button></div></td></tr>
+                  <tr><td>4</td><td><strong>BRT-004</strong></td><td>GTM-004</td><td>Volvo 7900</td><td>2021</td><td>80</td><td>Juan López</td><td><span class="badge b-green">● En Servicio</span></td><td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Eliminar</button></div></td></tr>
+                  <tr><td>5</td><td><strong>BRT-005</strong></td><td>GTM-005</td><td>Mercedes Citaro</td><td>2019</td><td>75</td><td><span style="color:#9ca3af">Sin asignar</span></td><td><span class="badge b-red">● Fuera Servicio</span></td><td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Eliminar</button></div></td></tr>
+                  <tr><td>6</td><td><strong>BRT-006</strong></td><td>GTM-006</td><td>Volvo 7900</td><td>2022</td><td>80</td><td>Ana Martínez</td><td><span class="badge b-green">● En Servicio</span></td><td><div style="display:flex;gap:5px"><button class="btn btn-outline btn-sm">Editar</button><button class="btn btn-danger btn-sm">Eliminar</button></div></td></tr>
+                </tbody>
+              </table></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== GPS ===================== -->
+<div class="screen" id="s-monitoreo">
+  <div class="screen-label">Monitoreo GPS en Tiempo Real</div>
+  <div class="browser">
+    <div class="browser-bar"><div class="browser-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><div class="browser-url">localhost:3000/monitoreo.html</div></div>
+    <div class="app">
+      <div class="sidebar">
+        <div class="s-logo"><div class="s-logo-icon">🚌</div><div class="s-logo-text"><h2>TRANSMETRO EN LÍNEA</h2><span>Sistema de Gestión</span></div></div>
+        <div class="s-nav"><div class="s-section">Principal</div><div class="s-item"><span class="s-icon">📊</span> Dashboard</div><div class="s-section">Gestión</div><div class="s-item"><span class="s-icon">🛣️</span> Rutas</div><div class="s-item"><span class="s-icon">🚌</span> Unidades</div><div class="s-item"><span class="s-icon">👤</span> Conductores</div><div class="s-item"><span class="s-icon">🔗</span> Asignaciones</div><div class="s-section">Operaciones</div><div class="s-item active"><span class="s-icon">🗺️</span> Monitoreo GPS</div><div class="s-item"><span class="s-icon">📈</span> Reportes</div></div>
+        <div class="s-footer"><div class="s-user"><div class="s-avatar">A</div><div class="s-user-info"><strong>Administrador</strong><small>admin</small></div></div></div>
+      </div>
+      <div class="main">
+        <div class="topbar"><div class="topbar-title">🗺️ Monitoreo GPS</div><div class="topbar-right"><span style="font-size:11px;color:#059669">● Conectado — 10:42:35</span><div class="t-avatar">A</div></div></div>
+        <div class="page">
+          <div style="display:grid;grid-template-columns:250px 1fr;gap:14px">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div class="card">
+                <div class="card-header" style="padding:10px 14px"><h3>Leyenda de Rutas</h3></div>
+                <div class="card-body" style="padding:10px;display:flex;flex-wrap:wrap;gap:6px">
+                  <span style="background:#80808022;color:#808080;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;border:2px solid #808080;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#808080;display:inline-block"></span>L1</span>
+                  <span style="background:#8B008B22;color:#8B008B;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;border:2px solid #8B008B;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#8B008B;display:inline-block"></span>L2</span>
+                  <span style="background:#DAA52022;color:#8B7500;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;border:2px solid #DAA520;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#DAA520;display:inline-block"></span>L6</span>
+                  <span style="background:#FF660022;color:#FF6600;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;border:2px solid #FF6600;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#FF6600;display:inline-block"></span>L12</span>
+                  <span style="background:#22882222;color:#228822;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;border:2px solid #228B22;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#228B22;display:inline-block"></span>L13</span>
+                  <span style="background:#00BFFF22;color:#0099CC;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;border:2px solid #00BFFF;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#00BFFF;display:inline-block"></span>L18</span>
+                  <span style="background:#00008022;color:#000080;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;border:2px solid #000080;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#000080;display:inline-block"></span>R5</span>
+                </div>
+              </div>
+              <div class="card" style="flex:1">
+                <div class="card-header" style="padding:10px 14px"><h3>Unidades Activas</h3><span class="badge b-green">4</span></div>
+                <div class="card-body" style="padding:8px;display:flex;flex-direction:column;gap:6px">
+                  <div class="unit-item active"><div class="unit-num">🚌 BRT-001</div><div class="unit-info">Vel: 34.2 km/h · L12 · 10:42:31</div></div>
+                  <div class="unit-item"><div class="unit-num">🚌 BRT-002</div><div class="unit-info">Vel: 28.7 km/h · L13 · 10:42:29</div></div>
+                  <div class="unit-item"><div class="unit-num">🚌 BRT-004</div><div class="unit-info">Vel: 41.1 km/h · L2 · 10:42:33</div></div>
+                  <div class="unit-item"><div class="unit-num">🚌 BRT-006</div><div class="unit-info">Vel: 22.5 km/h · L6 · 10:42:30</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><h3>Mapa de Rutas en Tiempo Real</h3><div style="display:flex;gap:8px"><button class="btn btn-sm" style="background:#f3f4f6;color:#374151">Ver todas las líneas</button><button class="btn btn-success btn-sm">Centrar mapa</button></div></div>
+              <div class="card-body" style="padding:8px">
+                <div style="height:460px;background:linear-gradient(180deg,#aad3df 0%,#c8e8c8 30%,#d4d4d4 60%,#b8c4cc 100%);border-radius:8px;position:relative;overflow:hidden">
+                  <img src="https://tile.openstreetmap.org/13/1921/3726.png" style="width:100%;height:100%;object-fit:cover;opacity:0.7" onerror="this.style.display='none'">
+                  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px">
+                    <div style="background:rgba(255,255,255,0.9);border-radius:10px;padding:12px 20px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.15)">
+                      <div style="font-size:24px;margin-bottom:6px">🗺️</div>
+                      <div style="font-size:13px;font-weight:600;color:#1e1e2e">Mapa OpenStreetMap</div>
+                      <div style="font-size:11px;color:#6b7280;margin-top:2px">Guatemala City · Zoom 13</div>
+                      <div style="margin-top:10px;display:flex;flex-direction:column;gap:4px">
+                        <div style="display:flex;align-items:center;gap:6px;font-size:11px"><div style="width:30px;height:4px;background:#FF6600;border-radius:2px"></div> Línea 12</div>
+                        <div style="display:flex;align-items:center;gap:6px;font-size:11px"><div style="width:30px;height:4px;background:#228B22;border-radius:2px"></div> Línea 13</div>
+                        <div style="display:flex;align-items:center;gap:6px;font-size:11px"><div style="width:30px;height:4px;background:#8B008B;border-radius:2px"></div> Línea 2</div>
+                      </div>
+                      <div style="margin-top:10px;padding:6px 12px;background:#0F0DFF;color:white;border-radius:6px;font-size:11px;font-weight:600">🚌 BRT-001 · 34.2 km/h</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== REPORTES ===================== -->
+<div class="screen" id="s-reportes">
+  <div class="screen-label">Reportes y Estadísticas</div>
+  <div class="browser">
+    <div class="browser-bar"><div class="browser-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><div class="browser-url">localhost:3000/reportes.html</div></div>
+    <div class="app">
+      <div class="sidebar">
+        <div class="s-logo"><div class="s-logo-icon">🚌</div><div class="s-logo-text"><h2>TRANSMETRO EN LÍNEA</h2><span>Sistema de Gestión</span></div></div>
+        <div class="s-nav"><div class="s-section">Principal</div><div class="s-item"><span class="s-icon">📊</span> Dashboard</div><div class="s-section">Gestión</div><div class="s-item"><span class="s-icon">🛣️</span> Rutas</div><div class="s-item"><span class="s-icon">🚌</span> Unidades</div><div class="s-item"><span class="s-icon">👤</span> Conductores</div><div class="s-item"><span class="s-icon">🔗</span> Asignaciones</div><div class="s-section">Operaciones</div><div class="s-item"><span class="s-icon">🗺️</span> Monitoreo GPS</div><div class="s-item active"><span class="s-icon">📈</span> Reportes</div></div>
+        <div class="s-footer"><div class="s-user"><div class="s-avatar">A</div><div class="s-user-info"><strong>Administrador</strong><small>admin</small></div></div></div>
+      </div>
+      <div class="main">
+        <div class="topbar"><div class="topbar-title">📈 Reportes y Estadísticas</div><div class="topbar-right"><div class="t-avatar">A</div></div></div>
+        <div class="page">
+          <div class="p-header"><div><h1>Reportes</h1><p>Genera y exporta reportes del sistema</p></div></div>
+          <div class="stats" style="margin-bottom:14px">
+            <div class="stat"><div class="stat-ic ic-azul">🚌</div><div><div class="stat-v">6</div><div class="stat-l">Total Unidades</div></div></div>
+            <div class="stat"><div class="stat-ic ic-verde">✅</div><div><div class="stat-v" style="color:#059669">4</div><div class="stat-l">En Servicio</div></div></div>
+            <div class="stat"><div class="stat-ic ic-azul">🛣️</div><div><div class="stat-v">8</div><div class="stat-l">Rutas Activas</div></div></div>
+            <div class="stat"><div class="stat-ic ic-verde">👤</div><div><div class="stat-v">4</div><div class="stat-l">Conductores Activos</div></div></div>
+          </div>
+          <div class="grid2" style="margin-bottom:14px">
+            <div class="card"><div class="card-header"><h3>Estado de Flota</h3></div><div class="card-body" style="display:flex;align-items:center;justify-content:center;gap:20px;height:180px"><div style="position:relative;width:120px;height:120px"><div style="width:120px;height:120px;border-radius:50%;background:conic-gradient(#86ED5A 0% 67%,#f59e0b 67% 83%,#ef4444 83% 100%)"></div><div style="position:absolute;inset:20%;background:white;border-radius:50%"></div></div><div style="font-size:11px"><div style="margin-bottom:5px;display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#86ED5A;display:inline-block"></span> En Servicio (4)</div><div style="margin-bottom:5px;display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;display:inline-block"></span> Mantenimiento (1)</div><div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:#ef4444;display:inline-block"></span> Fuera Servicio (1)</div></div></div></div>
+            <div class="card"><div class="card-header"><h3>Unidades por Ruta</h3></div><div class="card-body" style="display:flex;align-items:flex-end;gap:6px;height:180px;padding-bottom:8px"><div style="height:80%;background:#0F0DFF;border-radius:4px 4px 0 0;flex:1"></div><div style="height:60%;background:#86ED5A;border-radius:4px 4px 0 0;flex:1"></div><div style="height:40%;background:#0F0DFF;border-radius:4px 4px 0 0;flex:1"></div><div style="height:70%;background:#86ED5A;border-radius:4px 4px 0 0;flex:1"></div><div style="height:50%;background:#0F0DFF;border-radius:4px 4px 0 0;flex:1"></div><div style="height:30%;background:#86ED5A;border-radius:4px 4px 0 0;flex:1"></div></div></div>
+          </div>
+          <div class="card"><div class="card-header"><h3>Exportar Reportes</h3></div><div class="card-body"><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+            <div class="export-card"><div class="export-icon">🚌</div><div class="export-title">Unidades</div><div class="export-desc">Estado y datos de todos los buses</div><div class="export-btns"><button class="btn btn-danger btn-sm">📄 PDF</button><button class="btn btn-success btn-sm">📊 Excel</button></div></div>
+            <div class="export-card"><div class="export-icon">👤</div><div class="export-title">Conductores</div><div class="export-desc">Info y estado de conductores</div><div class="export-btns"><button class="btn btn-danger btn-sm">📄 PDF</button><button class="btn btn-success btn-sm">📊 Excel</button></div></div>
+            <div class="export-card"><div class="export-icon">🛣️</div><div class="export-title">Rutas</div><div class="export-desc">Listado completo de rutas</div><div class="export-btns"><button class="btn btn-danger btn-sm">📄 PDF</button><button class="btn btn-success btn-sm">📊 Excel</button></div></div>
+            <div class="export-card"><div class="export-icon">🔗</div><div class="export-title">Asignaciones</div><div class="export-desc">Asignaciones activas del sistema</div><div class="export-btns"><button class="btn btn-danger btn-sm">📄 PDF</button><button class="btn btn-success btn-sm">📊 Excel</button></div></div>
+          </div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===================== CONDUCTORES ===================== -->
+<div class="screen" id="s-conductores">
+  <div class="screen-label">Gestión de Conductores</div>
+  <div class="browser">
+    <div class="browser-bar"><div class="browser-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><div class="browser-url">localhost:3000/conductores.html</div></div>
+    <div class="app">
+      <div class="sidebar">
+        <div class="s-logo"><div class="s-logo-icon">🚌</div><div class="s-logo-text"><h2>TRANSMETRO EN LÍNEA</h2><span>Sistema de Gestión</span></div></div>
+        <div class="s-nav"><div class="s-section">Principal</div><div class="s-item"><span class="s-icon">📊</span> Dashboard</div><div class="s-section">Gestión</div><div class="s-item"><span class="s-icon">🛣️</span> Rutas</div><div class="s-item"><span class="s-icon">🚌</span> Unidades</div><div class="s-item active"><span class="s-icon">👤</span> Conductores</div><div class="s-item"><span class="s-icon">🔗</span> Asignaciones</div><div class="s-section">Operaciones</div><div class="s-item"><span class="s-icon">🗺️</span> Monitoreo GPS</div><div class="s-item"><span class="s-icon">📈</span> Reportes</div><div class="s-section">Admin</div><div class="s-item"><span class="s-icon">👥</span> Usuarios</div></div>
+        <div class="s-footer"><div class="s-user"><div class="s-avatar">A</div><div class="s-user-info"><strong>Administrador</strong><small>admin</small></div></div></div>
+      </div>
+      <div class="main">
+        <div class="topbar"><div class="topbar-title">👤 Gestión de Conductores</div><div class="topbar-right"><div class="t-avatar">A</div></div></div>
+        <div class="page">
+          <div class="p-header">
+            <div><h1>Conductores</h1><p>Registro y control del personal de conducción</p></div>
+            <button class="btn btn-primary">+ Nuevo Conductor</button>
+          </div>
+          <div class="stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+            <div class="stat"><div class="stat-ic ic-verde">👤</div><div><div class="stat-v">4</div><div class="stat-l">Total Conductores</div></div></div>
+            <div class="stat"><div class="stat-ic ic-verde">✅</div><div><div class="stat-v" style="color:#059669">3</div><div class="stat-l">Activos</div></div></div>
+            <div class="stat"><div class="stat-ic ic-rojo">⛔</div><div><div class="stat-v" style="color:#dc2626">1</div><div class="stat-l">Inactivos</div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header" style="gap:10px">
+              <h3>Lista de Conductores</h3>
+              <input class="form-input" placeholder="Buscar conductor..." style="max-width:220px;padding:5px 10px;font-size:12px">
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Nombre</th><th>DPI</th><th>Licencia</th><th>Tipo</th><th>Teléfono</th><th>Unidad Asignada</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody>
+                  <tr><td>1</td><td><strong>Carlos Mendoza</strong></td><td>2456789012345</td><td>LIC-001</td><td>Categoría A</td><td>5512-3456</td><td><span class="badge b-blue">BRT-001</span></td><td><span class="badge b-green">● Activo</span></td><td><button class="btn btn-outline btn-sm">Editar</button> <button class="btn btn-danger btn-sm">Eliminar</button></td></tr>
+                  <tr><td>2</td><td><strong>Pedro González</strong></td><td>1987654321098</td><td>LIC-002</td><td>Categoría A</td><td>5598-7654</td><td><span class="badge b-blue">BRT-002</span></td><td><span class="badge b-green">● Activo</span></td><td><button class="btn btn-outline btn-sm">Editar</button> <button class="btn btn-danger btn-sm">Eliminar</button></td></tr>
+                  <tr><td>3</td><td><strong>Miguel Ramírez</strong></td><td>3456789012312</td><td>LIC-003</td><td>Categoría B</td><td>5534-2109</td><td><span class="badge b-blue">BRT-003</span></td><td><span class="badge b-green">● Activo</span></td><td><button class="btn btn-outline btn-sm">Editar</button> <button class="btn btn-danger btn-sm">Eliminar</button></td></tr>
+                  <tr><td>4</td><td><strong>Juan García</strong></td><td>4567890123456</td><td>LIC-004</td><td>Categoría A</td><td>5567-8901</td><td><span class="badge b-gray">Sin asignar</span></td><td><span class="badge b-red">● Inactivo</span></td><td><button class="btn btn-outline btn-sm">Editar</button> <button class="btn btn-danger btn-sm">Eliminar</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ASIGNACIONES ===================== -->
+<div class="screen" id="s-asignaciones">
+  <div class="screen-label">Asignaciones Unidad–Ruta–Conductor</div>
+  <div class="browser">
+    <div class="browser-bar"><div class="browser-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><div class="browser-url">localhost:3000/asignaciones.html</div></div>
+    <div class="app">
+      <div class="sidebar">
+        <div class="s-logo"><div class="s-logo-icon">🚌</div><div class="s-logo-text"><h2>TRANSMETRO EN LÍNEA</h2><span>Sistema de Gestión</span></div></div>
+        <div class="s-nav"><div class="s-section">Principal</div><div class="s-item"><span class="s-icon">📊</span> Dashboard</div><div class="s-section">Gestión</div><div class="s-item"><span class="s-icon">🛣️</span> Rutas</div><div class="s-item"><span class="s-icon">🚌</span> Unidades</div><div class="s-item"><span class="s-icon">👤</span> Conductores</div><div class="s-item active"><span class="s-icon">🔗</span> Asignaciones</div><div class="s-section">Operaciones</div><div class="s-item"><span class="s-icon">🗺️</span> Monitoreo GPS</div><div class="s-item"><span class="s-icon">📈</span> Reportes</div><div class="s-section">Admin</div><div class="s-item"><span class="s-icon">👥</span> Usuarios</div></div>
+        <div class="s-footer"><div class="s-user"><div class="s-avatar">A</div><div class="s-user-info"><strong>Administrador</strong><small>admin</small></div></div></div>
+      </div>
+      <div class="main">
+        <div class="topbar"><div class="topbar-title">🔗 Asignaciones</div><div class="topbar-right"><div class="t-avatar">A</div></div></div>
+        <div class="page">
+          <div class="p-header">
+            <div><h1>Asignaciones</h1><p>Gestión de asignaciones unidad–ruta–conductor</p></div>
+            <button class="btn btn-primary">+ Nueva Asignación</button>
+          </div>
+          <div class="stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+            <div class="stat"><div class="stat-ic ic-azul">🔗</div><div><div class="stat-v">3</div><div class="stat-l">Asignaciones Activas</div></div></div>
+            <div class="stat"><div class="stat-ic ic-verde">🚌</div><div><div class="stat-v" style="color:#059669">3</div><div class="stat-l">Unidades en Ruta</div></div></div>
+            <div class="stat"><div class="stat-ic ic-naranja">⏳</div><div><div class="stat-v" style="color:#d97706">1</div><div class="stat-l">Pendiente Inicio</div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Lista de Asignaciones</h3></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Unidad</th><th>Ruta</th><th>Conductor</th><th>Turno</th><th>Inicio</th><th>Fin</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody>
+                  <tr><td>1</td><td><strong>BRT-001</strong></td><td><span class="badge b-blue">Línea 1</span> Zona Occ. – San Sebastián</td><td>Carlos Mendoza</td><td>Mañana</td><td>05:00</td><td>13:00</td><td><span class="badge b-green">● Activa</span></td><td><button class="btn btn-outline btn-sm">Ver</button> <button class="btn btn-danger btn-sm">Terminar</button></td></tr>
+                  <tr><td>2</td><td><strong>BRT-002</strong></td><td><span class="badge" style="background:rgba(255,140,0,0.1);color:#e67e00">Línea 2</span> Norte – Hipódromo</td><td>Pedro González</td><td>Mañana</td><td>05:30</td><td>13:30</td><td><span class="badge b-green">● Activa</span></td><td><button class="btn btn-outline btn-sm">Ver</button> <button class="btn btn-danger btn-sm">Terminar</button></td></tr>
+                  <tr><td>3</td><td><strong>BRT-003</strong></td><td><span class="badge" style="background:rgba(0,150,136,0.1);color:#00796b">Línea 6</span> Sur – Plaza Berlín</td><td>Miguel Ramírez</td><td>Tarde</td><td>13:00</td><td>21:00</td><td><span class="badge b-green">● Activa</span></td><td><button class="btn btn-outline btn-sm">Ver</button> <button class="btn btn-danger btn-sm">Terminar</button></td></tr>
+                  <tr><td>4</td><td><strong>BRT-004</strong></td><td><span class="badge" style="background:rgba(156,39,176,0.1);color:#7b1fa2">Línea 7</span> Oriental – Proyect.</td><td><span style="color:#9ca3af;font-style:italic">Sin conductor</span></td><td>Tarde</td><td>14:00</td><td>22:00</td><td><span class="badge b-yellow">⏳ Pendiente</span></td><td><button class="btn btn-outline btn-sm">Ver</button> <button class="btn btn-danger btn-sm">Terminar</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== USUARIOS ===================== -->
+<div class="screen" id="s-usuarios">
+  <div class="screen-label">Gestión de Usuarios del Sistema</div>
+  <div class="browser">
+    <div class="browser-bar"><div class="browser-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><div class="browser-url">localhost:3000/usuarios.html</div></div>
+    <div class="app">
+      <div class="sidebar">
+        <div class="s-logo"><div class="s-logo-icon">🚌</div><div class="s-logo-text"><h2>TRANSMETRO EN LÍNEA</h2><span>Sistema de Gestión</span></div></div>
+        <div class="s-nav"><div class="s-section">Principal</div><div class="s-item"><span class="s-icon">📊</span> Dashboard</div><div class="s-section">Gestión</div><div class="s-item"><span class="s-icon">🛣️</span> Rutas</div><div class="s-item"><span class="s-icon">🚌</span> Unidades</div><div class="s-item"><span class="s-icon">👤</span> Conductores</div><div class="s-item"><span class="s-icon">🔗</span> Asignaciones</div><div class="s-section">Operaciones</div><div class="s-item"><span class="s-icon">🗺️</span> Monitoreo GPS</div><div class="s-item"><span class="s-icon">📈</span> Reportes</div><div class="s-section">Admin</div><div class="s-item active"><span class="s-icon">👥</span> Usuarios</div></div>
+        <div class="s-footer"><div class="s-user"><div class="s-avatar">A</div><div class="s-user-info"><strong>Administrador</strong><small>admin</small></div></div></div>
+      </div>
+      <div class="main">
+        <div class="topbar"><div class="topbar-title">👥 Gestión de Usuarios</div><div class="topbar-right"><div class="t-avatar">A</div></div></div>
+        <div class="page">
+          <div class="p-header">
+            <div><h1>Usuarios</h1><p>Administración de usuarios y roles del sistema</p></div>
+            <button class="btn btn-primary">+ Nuevo Usuario</button>
+          </div>
+          <div class="stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px">
+            <div class="stat"><div class="stat-ic ic-azul">👥</div><div><div class="stat-v">3</div><div class="stat-l">Total Usuarios</div></div></div>
+            <div class="stat"><div class="stat-ic ic-verde">🔑</div><div><div class="stat-v">1</div><div class="stat-l">Administradores</div></div></div>
+            <div class="stat"><div class="stat-ic ic-naranja">👁️</div><div><div class="stat-v">2</div><div class="stat-l">Operadores</div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header" style="gap:10px">
+              <h3>Lista de Usuarios</h3>
+              <input class="form-input" placeholder="Buscar usuario..." style="max-width:220px;padding:5px 10px;font-size:12px">
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Nombre</th><th>Correo Electrónico</th><th>Rol</th><th>Último Acceso</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody>
+                  <tr><td>1</td><td><div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;background:#0F0DFF;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700">A</div><strong>Administrador</strong></div></td><td>admin@transmetro.gt</td><td><span class="badge b-blue">🔑 Administrador</span></td><td>Hoy 08:45</td><td><span class="badge b-green">● Activo</span></td><td><button class="btn btn-outline btn-sm">Editar</button></td></tr>
+                  <tr><td>2</td><td><div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;background:#86ED5A;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#1a1a1a;font-size:11px;font-weight:700">L</div><strong>Luis Hernández</strong></div></td><td>luis@transmetro.gt</td><td><span class="badge b-gray">👁️ Operador</span></td><td>Hoy 07:30</td><td><span class="badge b-green">● Activo</span></td><td><button class="btn btn-outline btn-sm">Editar</button> <button class="btn btn-danger btn-sm">Eliminar</button></td></tr>
+                  <tr><td>3</td><td><div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;background:#f59e0b;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:700">M</div><strong>María López</strong></div></td><td>maria@transmetro.gt</td><td><span class="badge b-gray">👁️ Operador</span></td><td>Ayer 16:20</td><td><span class="badge b-green">● Activo</span></td><td><button class="btn btn-outline btn-sm">Editar</button> <button class="btn btn-danger btn-sm">Eliminar</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Formulario Crear/Editar Usuario -->
+          <div class="card" style="margin-top:14px">
+            <div class="card-header"><h3>➕ Crear / Editar Usuario</h3></div>
+            <div class="card-body">
+              <div class="grid2">
+                <div class="form-group"><label class="form-label">Nombre completo</label><input class="form-input" placeholder="Ej: Juan Pérez"></div>
+                <div class="form-group"><label class="form-label">Correo electrónico</label><input class="form-input" placeholder="usuario@transmetro.gt"></div>
+                <div class="form-group"><label class="form-label">Contraseña</label><input class="form-input" type="password" placeholder="••••••••"></div>
+                <div class="form-group"><label class="form-label">Rol</label><select class="form-input"><option>Administrador</option><option selected>Operador</option></select></div>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:4px">
+                <button class="btn btn-primary">Guardar Usuario</button>
+                <button class="btn btn-outline">Cancelar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function show(name) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  var screen = document.getElementById('s-' + name);
+  if (screen) screen.classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>

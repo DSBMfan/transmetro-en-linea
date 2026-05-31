@@ -1,0 +1,122 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Conductores - Transmetro en Linea</title>
+<link rel="stylesheet" href="/css/styles.css">
+<script src="/js/api.js"></script>
+</head><body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo" style="background:white;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.1)">
+    <img src="/assets/images/logos/Logo-Transmetro.png" alt="Transmetro en Linea" style="width:100%;max-width:175px;height:auto;display:block">
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <a class="nav-item" data-page="dashboard"><span class="nav-icon">&#x1F4CA;</span> Dashboard</a>
+    <div class="nav-section">Gestion</div>
+    <a class="nav-item" data-page="rutas"><span class="nav-icon">&#x1F6E3;&#xFE0F;</span> Rutas</a>
+    <a class="nav-item" data-page="unidades"><span class="nav-icon">&#x1F68C;</span> Unidades</a>
+    <a class="nav-item" data-page="conductores"><span class="nav-icon">&#x1F464;</span> Conductores</a>
+    <a class="nav-item" data-page="asignaciones"><span class="nav-icon">&#x1F517;</span> Asignaciones</a>
+    <div class="nav-section">Operaciones</div>
+    <a class="nav-item" data-page="monitoreo"><span class="nav-icon">&#x1F5FA;&#xFE0F;</span> Monitoreo GPS</a>
+    <a class="nav-item" data-page="reportes"><span class="nav-icon">&#x1F4C8;</span> Reportes</a>
+    <div class="nav-section">Admin</div>
+    <a class="nav-item" data-page="usuarios"><span class="nav-icon">&#x1F465;</span> Usuarios</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="avatar" id="sidebarAvatar">A</div>
+      <div class="user-info"><strong id="sidebarName">Admin</strong><small id="sidebarRol">admin</small></div>
+    </div>
+    <button id="logoutBtn" class="btn btn-danger btn-sm" style="width:100%;margin-top:10px">Cerrar sesion</button>
+  </div>
+</aside>
+<div class="main-content">
+<div class="topbar">
+<div class="topbar-title">Conductores</div>
+<div class="topbar-right"><div class="topbar-avatar" id="topbarAvatar">A</div></div>
+</div>
+<div class="page-content">
+<div class="page-header">
+  <div><h1>Conductores</h1><p>Gestion de conductores del sistema</p></div>
+  <button class="btn btn-primary" onclick="abrirModal()">+ Nuevo Conductor</button>
+</div>
+<div class="card">
+  <div class="card-header">
+    <h3>Lista de Conductores</h3>
+    <div class="search-bar" style="margin:0">
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar por nombre, DPI, licencia..." oninput="filtrar(this.value)" style="min-width:280px">
+      <select class="form-control" id="filterEstado" onchange="filtrar()" style="width:auto">
+        <option value="">Todos</option><option value="activo">Activos</option><option value="inactivo">Inactivos</option>
+      </select>
+    </div>
+  </div>
+  <div class="card-body"><div class="table-wrap"><table>
+    <thead><tr><th>No.</th><th>Nombre</th><th>DPI</th><th>Licencia</th><th>Telefono</th><th>Unidad</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody id="tbConductores"><tr><td colspan="8" class="loading"><div class="spinner"></div></td></tr></tbody>
+  </table></div></div>
+</div>
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal"><div class="modal-header"><h3 id="modalTitle">Nuevo Conductor</h3><button class="modal-close" onclick="cerrarModal()">x</button></div>
+  <div class="modal-body">
+    <input type="hidden" id="editId">
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Nombre *</label><input class="form-control" id="fNombre" required></div>
+      <div class="form-group"><label class="form-label">Apellido *</label><input class="form-control" id="fApellido" required></div>
+      <div class="form-group"><label class="form-label">DPI</label><input class="form-control" id="fDpi"></div>
+      <div class="form-group"><label class="form-label">Licencia</label><input class="form-control" id="fLicencia"></div>
+      <div class="form-group"><label class="form-label">Telefono</label><input class="form-control" id="fTelefono"></div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-control" type="email" id="fEmail"></div>
+      <div class="form-group"><label class="form-label">Estado</label><select class="form-control" id="fEstado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div>
+    </div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button><button class="btn btn-primary" onclick="guardar()">Guardar</button></div>
+  </div>
+</div>
+<script>
+var conductores=[], loadId=0;
+async function cargar(){
+  var mid=++loadId;
+  document.getElementById("tbConductores").innerHTML="<tr><td colspan='8' class='loading'><div class='spinner'></div></td></tr>";
+  try{
+    var data=await api.get("/conductores");
+    if(mid!==loadId)return;
+    conductores=data;
+    renderTabla(conductores);
+  }catch(e){
+    if(mid!==loadId)return;
+    document.getElementById("tbConductores").innerHTML="<tr><td colspan='8' style='text-align:center;color:#ef4444;padding:24px'>⚠️ Error al cargar conductores. Verifica que el servidor esté activo.</td></tr>";
+  }
+}
+function renderTabla(data){
+  var tb=document.getElementById("tbConductores");
+  if(!data.length){tb.innerHTML="<tr><td colspan=8 style='text-align:center;padding:30px;color:#9ca3af'>No hay conductores</td></tr>";return;}
+  tb.innerHTML=data.map(function(c,i){
+    return "<tr><td>"+(i+1)+"</td><td><strong>"+c.nombre+" "+c.apellido+"</strong></td><td>"+(c.dpi||"-")+"</td><td>"+(c.licencia||"-")+"</td><td>"+(c.telefono||"-")+"</td><td>"+(c.unidad_numero||"<span style='color:#9ca3af'>Sin asignar</span>")+"</td><td>"+badgeEstadoConductor(c.estado)+"</td><td><div style='display:flex;gap:6px'><button class='btn btn-sm btn-outline' onclick='editar("+c.id+")'>Editar</button><button class='btn btn-sm btn-danger' onclick='eliminar("+c.id+")'>Eliminar</button></div></td></tr>";
+  }).join("");
+}
+function filtrar(){
+  var q=document.getElementById("searchInput").value.toLowerCase();
+  var e=document.getElementById("filterEstado").value;
+  renderTabla(conductores.filter(function(c){
+    return(!q||(c.nombre+" "+c.apellido+" "+c.dpi+" "+c.licencia).toLowerCase().includes(q))&&(!e||c.estado===e);
+  }));
+}
+function abrirModal(d){
+  document.getElementById("modalTitle").textContent=d?"Editar Conductor":"Nuevo Conductor";
+  ["editId","fNombre","fApellido","fDpi","fLicencia","fTelefono","fEmail"].forEach(function(id){document.getElementById(id).value="";});
+  if(d){document.getElementById("editId").value=d.id;document.getElementById("fNombre").value=d.nombre;document.getElementById("fApellido").value=d.apellido;document.getElementById("fDpi").value=d.dpi||"";document.getElementById("fLicencia").value=d.licencia||"";document.getElementById("fTelefono").value=d.telefono||"";document.getElementById("fEmail").value=d.email||"";document.getElementById("fEstado").value=d.estado;}
+  document.getElementById("modalOverlay").classList.add("active");
+}
+function cerrarModal(){document.getElementById("modalOverlay").classList.remove("active");}
+function editar(id){var c=conductores.find(function(x){return x.id===id;});if(c)abrirModal(c);}
+async function guardar(){
+  var id=document.getElementById("editId").value;
+  var data={nombre:document.getElementById("fNombre").value,apellido:document.getElementById("fApellido").value,dpi:document.getElementById("fDpi").value,licencia:document.getElementById("fLicencia").value,telefono:document.getElementById("fTelefono").value,email:document.getElementById("fEmail").value,estado:document.getElementById("fEstado").value};
+  try{if(id)await api.put("/conductores/"+id,data);else await api.post("/conductores",data);toast(id?"Conductor actualizado":"Conductor registrado","success");cerrarModal();await cargar();}catch(e){toast(e.message,"error");}
+}
+async function eliminar(id){if(!confirm("Eliminar conductor?"))return;try{await api.del("/conductores/"+id);toast("Conductor eliminado","success");await cargar();}catch(e){toast(e.message,"error");}}
+cargar();
+</script>
+</div></div>
+<script>setupSidebar("conductores")</script>
+</body></html>

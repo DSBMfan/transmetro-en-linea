@@ -1,0 +1,10 @@
+const router = require('express').Router();
+const c = require('../controllers/usuariosController');
+const { verificarToken, soloAdmin } = require('../middleware/auth');
+router.use(verificarToken);
+router.get('/', c.listar);
+router.get('/:id', c.obtener);
+router.post('/', soloAdmin, c.crear);
+router.put('/:id', soloAdmin, c.actualizar);
+router.delete('/:id', soloAdmin, c.eliminar);
+module.exports = router;

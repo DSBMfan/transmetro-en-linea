@@ -1,0 +1,109 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Asignaciones - Transmetro en Linea</title>
+<link rel="stylesheet" href="/css/styles.css">
+<script src="/js/api.js"></script>
+
+</head><body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo" style="background:white;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.1)">
+    <img src="/assets/images/logos/Logo-Transmetro.png" alt="Transmetro en Linea" style="width:100%;max-width:175px;height:auto;display:block">
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <a class="nav-item" data-page="dashboard"><span class="nav-icon">&#x1F4CA;</span> Dashboard</a>
+    <div class="nav-section">Gestion</div>
+    <a class="nav-item" data-page="rutas"><span class="nav-icon">&#x1F6E3;&#xFE0F;</span> Rutas</a>
+    <a class="nav-item" data-page="unidades"><span class="nav-icon">&#x1F68C;</span> Unidades</a>
+    <a class="nav-item" data-page="conductores"><span class="nav-icon">&#x1F464;</span> Conductores</a>
+    <a class="nav-item" data-page="asignaciones"><span class="nav-icon">&#x1F517;</span> Asignaciones</a>
+    <div class="nav-section">Operaciones</div>
+    <a class="nav-item" data-page="monitoreo"><span class="nav-icon">&#x1F5FA;&#xFE0F;</span> Monitoreo GPS</a>
+    <a class="nav-item" data-page="reportes"><span class="nav-icon">&#x1F4C8;</span> Reportes</a>
+    <div class="nav-section">Admin</div>
+    <a class="nav-item" data-page="usuarios"><span class="nav-icon">&#x1F465;</span> Usuarios</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="avatar" id="sidebarAvatar">A</div>
+      <div class="user-info"><strong id="sidebarName">Admin</strong><small id="sidebarRol">admin</small></div>
+    </div>
+    <button id="logoutBtn" class="btn btn-danger btn-sm" style="width:100%;margin-top:10px">Cerrar sesion</button>
+  </div>
+</aside>
+<div class="main-content">
+<div class="topbar">
+<div class="topbar-title">Asignaciones</div>
+<div class="topbar-right"><div class="topbar-avatar" id="topbarAvatar">A</div></div>
+</div>
+<div class="page-content">
+<div class="page-header">
+  <div><h1>Asignaciones</h1><p>Asignacion de buses y conductores a rutas</p></div>
+  <button class="btn btn-primary" onclick="abrirModal()">+ Nueva Asignacion</button>
+</div>
+<div class="card"><div class="card-header"><h3>Lista de Asignaciones</h3></div>
+  <div class="card-body"><div class="table-wrap"><table>
+    <thead><tr><th>No.</th><th>Unidad</th><th>Ruta</th><th>Conductor</th><th>Fecha Inicio</th><th>Fecha Fin</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody id="tbAsig"><tr><td colspan="8" class="loading"><div class="spinner"></div></td></tr></tbody>
+  </table></div></div>
+</div>
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal"><div class="modal-header"><h3 id="modalTitle">Nueva Asignacion</h3><button class="modal-close" onclick="cerrarModal()">x</button></div>
+  <div class="modal-body">
+    <input type="hidden" id="editId">
+    <div class="form-group"><label class="form-label">Unidad *</label><select class="form-control" id="fUnidad"></select></div>
+    <div class="form-group"><label class="form-label">Ruta *</label><select class="form-control" id="fRuta"></select></div>
+    <div class="form-group"><label class="form-label">Conductor *</label><select class="form-control" id="fConductor"></select></div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Fecha Inicio *</label><input type="date" class="form-control" id="fFechaInicio"></div>
+      <div class="form-group"><label class="form-label">Fecha Fin</label><input type="date" class="form-control" id="fFechaFin"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Estado</label><select class="form-control" id="fEstado"><option value="activa">Activa</option><option value="inactiva">Inactiva</option></select></div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button><button class="btn btn-primary" onclick="guardar()">Guardar</button></div>
+  </div>
+</div>
+<script>
+var asigs=[], loadId=0;
+async function cargar(){
+  var mid=++loadId;
+  var tb=document.getElementById("tbAsig");
+  tb.innerHTML="<tr><td colspan='8' class='loading'><div class='spinner'></div></td></tr>";
+  try{
+    var data=await api.get("/asignaciones");
+    if(mid!==loadId)return;
+    asigs=data;
+    if(!asigs.length){tb.innerHTML="<tr><td colspan='8' style='text-align:center;padding:30px;color:#9ca3af'>No hay asignaciones</td></tr>";return;}
+    tb.innerHTML=asigs.map(function(a,i){
+      return "<tr><td>"+(i+1)+"</td><td><strong>"+a.unidad_numero+"</strong></td><td>"+a.ruta_nombre+"</td><td>"+a.conductor_nombre+" "+a.conductor_apellido+"</td><td>"+(a.fecha_inicio||"-")+"</td><td>"+(a.fecha_fin||"Indefinida")+"</td><td>"+(a.estado==="activa"?"<span class='badge badge-success'>Activa</span>":"<span class='badge badge-secondary'>Inactiva</span>")+"</td><td><div style='display:flex;gap:6px'><button class='btn btn-sm btn-outline' onclick='editar("+a.id+")'>Editar</button><button class='btn btn-sm btn-danger' onclick='eliminar("+a.id+")'>Eliminar</button></div></td></tr>";
+    }).join("");
+  }catch(e){
+    if(mid!==loadId)return;
+    tb.innerHTML="<tr><td colspan='8' style='text-align:center;color:#ef4444;padding:24px'>⚠️ Error al cargar asignaciones. Verifica que el servidor esté activo.</td></tr>";
+  }
+}
+async function abrirModal(d){
+  document.getElementById("modalTitle").textContent=d?"Editar Asignacion":"Nueva Asignacion";
+  document.getElementById("editId").value=d?d.id:"";
+  var [unidades,rutas,conductores]=await Promise.all([api.get("/unidades"),api.get("/rutas"),api.get("/conductores")]);
+  var selU=document.getElementById("fUnidad");selU.innerHTML=unidades.filter(function(u){return u.estado==="en_servicio";}).map(function(u){return"<option value="+u.id+(d&&d.unidad_id===u.id?" selected":"")+">"+u.numero+" - "+u.placa+"</option>";}).join("");
+  var selR=document.getElementById("fRuta");selR.innerHTML=rutas.map(function(r){return"<option value="+r.id+(d&&d.ruta_id===r.id?" selected":"")+">"+r.nombre+"</option>";}).join("");
+  var selC=document.getElementById("fConductor");selC.innerHTML=conductores.filter(function(c){return c.estado==="activo";}).map(function(c){return"<option value="+c.id+(d&&d.conductor_id===c.id?" selected":"")+">"+c.nombre+" "+c.apellido+"</option>";}).join("");
+  document.getElementById("fFechaInicio").value=d?d.fecha_inicio:"";
+  document.getElementById("fFechaFin").value=d?d.fecha_fin||"":"";
+  if(d)document.getElementById("fEstado").value=d.estado;
+  document.getElementById("modalOverlay").classList.add("active");
+}
+function cerrarModal(){document.getElementById("modalOverlay").classList.remove("active");}
+function editar(id){var a=asigs.find(function(x){return x.id===id;});if(a)abrirModal(a);}
+async function guardar(){
+  var id=document.getElementById("editId").value;
+  var data={unidad_id:document.getElementById("fUnidad").value,ruta_id:document.getElementById("fRuta").value,conductor_id:document.getElementById("fConductor").value,fecha_inicio:document.getElementById("fFechaInicio").value,fecha_fin:document.getElementById("fFechaFin").value||null,estado:document.getElementById("fEstado").value};
+  try{if(id)await api.put("/asignaciones/"+id,data);else await api.post("/asignaciones",data);toast(id?"Asignacion actualizada":"Asignacion creada","success");cerrarModal();await cargar();}catch(e){toast(e.message,"error");}
+}
+async function eliminar(id){if(!confirm("Eliminar asignacion?"))return;try{await api.del("/asignaciones/"+id);toast("Eliminada","success");await cargar();}catch(e){toast(e.message,"error");}}
+cargar();
+</script>
+</div></div>
+<script>setupSidebar("asignaciones")</script>
+</body></html>

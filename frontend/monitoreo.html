@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Monitoreo GPS - Transmetro en Linea</title>
+<link rel="stylesheet" href="/css/styles.css">
+<script src="/js/api.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+#mapa { height: calc(100vh - 200px); min-height: 500px; border-radius: 12px; z-index: 1; }
+.unidad-panel { max-height: calc(100vh - 220px); overflow-y: auto; }
+.unidad-card { padding: 12px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
+.unidad-card:hover, .unidad-card.active { border-color: var(--azul); background: rgba(15,13,255,0.04); }
+.unidad-card .num { font-weight: 700; font-size: 14px; }
+.unidad-card .info { font-size: 12px; color: var(--text-light); margin-top: 3px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+.dot-verde { background: var(--verde); }
+.dot-rojo { background: var(--danger); }
+.dot-naranja { background: var(--warning); }
+.linea-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.linea-chip { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
+.linea-chip:hover { opacity: 0.85; }
+.linea-chip.off { opacity: 0.35; }
+</style>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo" style="background:white;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.1)">
+    <img src="/assets/images/logos/Logo-Transmetro.png" alt="Transmetro en Linea" style="width:100%;max-width:175px;height:auto;display:block">
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <a class="nav-item" data-page="dashboard"><span class="nav-icon">&#x1F4CA;</span> Dashboard</a>
+    <div class="nav-section">Gestion</div>
+    <a class="nav-item" data-page="rutas"><span class="nav-icon">&#x1F6E3;&#xFE0F;</span> Rutas</a>
+    <a class="nav-item" data-page="unidades"><span class="nav-icon">&#x1F68C;</span> Unidades</a>
+    <a class="nav-item" data-page="conductores"><span class="nav-icon">&#x1F464;</span> Conductores</a>
+    <a class="nav-item" data-page="asignaciones"><span class="nav-icon">&#x1F517;</span> Asignaciones</a>
+    <div class="nav-section">Operaciones</div>
+    <a class="nav-item" data-page="monitoreo"><span class="nav-icon">&#x1F5FA;&#xFE0F;</span> Monitoreo GPS</a>
+    <a class="nav-item" data-page="reportes"><span class="nav-icon">&#x1F4C8;</span> Reportes</a>
+    <div class="nav-section">Admin</div>
+    <a class="nav-item" data-page="usuarios"><span class="nav-icon">&#x1F465;</span> Usuarios</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="avatar" id="sidebarAvatar">A</div>
+      <div class="user-info"><strong id="sidebarName">Admin</strong><small id="sidebarRol">admin</small></div>
+    </div>
+    <button id="logoutBtn" class="btn btn-danger btn-sm" style="width:100%;margin-top:10px">Cerrar sesion</button>
+  </div>
+</aside>
+
+<div class="main-content">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">&#x1F5FA;&#xFE0F; Monitoreo GPS</div>
+    </div>
+    <div class="topbar-right">
+      <span id="ultimaAct" style="font-size:12px;color:#9ca3af"></span>
+      <div class="topbar-avatar" id="topbarAvatar">A</div>
+    </div>
+  </div>
+  <div class="page-content">
+    <div style="display:grid;grid-template-columns:280px 1fr;gap:18px">
+
+      <div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header" style="padding:12px 16px"><h3 style="font-size:13px">Leyenda de Rutas</h3></div>
+          <div class="card-body" style="padding:12px">
+            <div class="linea-legend" id="leyendaLineas"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header" style="padding:12px 16px">
+            <h3 style="font-size:13px">Unidades Activas</h3>
+            <span id="countUnidades" class="badge badge-success">0</span>
+          </div>
+          <div class="card-body" style="padding:10px">
+            <div class="unidad-panel" id="unidadesPanel">
+              <div class="loading"><div class="spinner"></div> Conectando...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Mapa de Rutas en Tiempo Real</h3>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm btn-secondary" onclick="mostrarTodasLineas()">Ver todas las lineas</button>
+              <button class="btn btn-sm btn-success" onclick="centrarMapa()">Centrar mapa</button>
+            </div>
+          </div>
+          <div class="card-body" style="padding:10px">
+            <div id="mapa"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+setupSidebar('monitoreo');
+
+var map = L.map('mapa', { center: [14.6350, -90.5150], zoom: 13 });
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: 'OpenStreetMap contributors', maxZoom: 18
+}).addTo(map);
+
+// ==========================================
+// DATOS DE RUTAS DEL MAPA (coordenadas Guatemala City)
+// ==========================================
+var lineasConfig = {
+  '1': { nombre: 'Linea 1', color: '#A0A0A0', coords: [[14.5980,-90.5565],[14.6010,-90.5545],[14.6040,-90.5525],[14.6068,-90.5505],[14.6098,-90.5488],[14.6148,-90.5455],[14.6218,-90.5398],[14.6248,-90.5358],[14.6278,-90.5318],[14.6318,-90.5278],[14.6348,-90.5238],[14.6368,-90.5188],[14.6372,-90.5175],[14.6380,-90.5162],[14.6392,-90.5138],[14.6428,-90.5138],[14.6498,-90.5122]] },
+  '2': { nombre: 'Linea 2', color: '#8B008B', coords: [[14.6648,-90.5092],[14.6600,-90.5102],[14.6558,-90.5110],[14.6518,-90.5115],[14.6498,-90.5122],[14.6428,-90.5138],[14.6415,-90.5140],[14.6408,-90.5118],[14.6400,-90.5132],[14.6382,-90.5120],[14.6352,-90.5125],[14.6302,-90.5120],[14.6345,-90.5182],[14.6330,-90.5162],[14.6322,-90.5148],[14.6315,-90.5132],[14.6295,-90.5142]] },
+  '6': { nombre: 'Linea 6', color: '#DAA520', coords: [[14.6718,-90.4952],[14.6668,-90.4962],[14.6618,-90.4982],[14.6558,-90.5012],[14.6508,-90.5032],[14.6468,-90.5042],[14.6448,-90.5022],[14.6428,-90.5012],[14.6388,-90.5022],[14.6448,-90.5075],[14.6428,-90.5082],[14.6418,-90.5098],[14.6428,-90.5098],[14.6422,-90.5068],[14.6418,-90.5062]] },
+  '7': { nombre: 'Linea 7', color: '#696969', coords: [[14.5919,-90.5536],[14.6020,-90.5480],[14.6120,-90.5380],[14.6200,-90.5280],[14.6270,-90.5200],[14.6315,-90.5132]] },
+  '12': { nombre: 'Linea 12', color: '#FF6600', coords: [[14.5638,-90.5480],[14.5718,-90.5420],[14.5798,-90.5365],[14.5876,-90.5305],[14.5958,-90.5255],[14.6035,-90.5198],[14.6095,-90.5172],[14.6158,-90.5162],[14.6218,-90.5148],[14.6272,-90.5138],[14.6315,-90.5130],[14.6322,-90.5148]] },
+  '13': { nombre: 'Linea 13', color: '#228B22', coords: [[14.5508,-90.5148],[14.5598,-90.5148],[14.5718,-90.5148],[14.5838,-90.5148],[14.5958,-90.5148],[14.6058,-90.5148],[14.6098,-90.5130],[14.6138,-90.5130],[14.6188,-90.5130],[14.6238,-90.5148],[14.6278,-90.5162],[14.6308,-90.5168],[14.6318,-90.5158],[14.6308,-90.5138],[14.6295,-90.5140]] },
+  '18': { nombre: 'Linea 18', color: '#00BFFF', coords: [[14.6748,-90.4852],[14.6718,-90.4882],[14.6688,-90.4912],[14.6538,-90.4892],[14.6488,-90.4902],[14.6448,-90.4932],[14.6428,-90.4882],[14.6398,-90.5022],[14.6328,-90.5005],[14.6198,-90.4862]] },
+  '5': { nombre: 'Ruta 5', color: '#000080', coords: [[14.6418,-90.5062],[14.6422,-90.5068],[14.6428,-90.5098],[14.6398,-90.5022],[14.6328,-90.5005],[14.6248,-90.4982],[14.6198,-90.4862]] }
+};
+
+var polylines = {};
+var unidadesMarkers = {};
+var lineasActivas = {};
+var rutasDB = {};
+
+// Dibujar rutas
+Object.keys(lineasConfig).forEach(function(num) {
+  var lc = lineasConfig[num];
+  lineasActivas[num] = true;
+  var poly = L.polyline(lc.coords, { color: lc.color, weight: 5, opacity: 0.8 }).addTo(map);
+
+  // Popup al click en la linea con informacion
+  poly.bindPopup('<div style="min-width:200px"><strong style="font-size:14px">' + lc.nombre + '</strong><br><span style="font-size:12px;color:#666">Haz click en el marcador de una parada para ver mas info</span></div>');
+
+  // Marcar paradas con circulos pequenos
+  lc.coords.forEach(function(c, i) {
+    L.circleMarker(c, { radius: 4, fillColor: lc.color, color: 'white', weight: 2, fillOpacity: 1 }).addTo(map);
+  });
+
+  polylines[num] = poly;
+});
+
+// Leyenda de lineas
+var leyenda = document.getElementById('leyendaLineas');
+Object.keys(lineasConfig).forEach(function(num) {
+  var lc = lineasConfig[num];
+  var chip = document.createElement('div');
+  chip.className = 'linea-chip';
+  chip.id = 'chip_' + num;
+  chip.style.cssText = 'background:' + lc.color + '22;color:' + lc.color + ';border-color:' + lc.color;
+  chip.innerHTML = '<span style="width:10px;height:10px;border-radius:50%;background:' + lc.color + ';display:inline-block"></span>' + lc.nombre;
+  chip.addEventListener('click', function() { toggleLinea(num, chip); });
+  leyenda.appendChild(chip);
+});
+
+function toggleLinea(num, chip) {
+  if (lineasActivas[num]) {
+    polylines[num].setStyle({ opacity: 0 });
+    chip.classList.add('off');
+    lineasActivas[num] = false;
+  } else {
+    polylines[num].setStyle({ opacity: 0.8 });
+    chip.classList.remove('off');
+    lineasActivas[num] = true;
+  }
+}
+
+function mostrarTodasLineas() {
+  Object.keys(lineasConfig).forEach(function(num) {
+    polylines[num].setStyle({ opacity: 0.8 });
+    var chip = document.getElementById('chip_' + num);
+    if (chip) chip.classList.remove('off');
+    lineasActivas[num] = true;
+  });
+}
+
+function centrarMapa() { map.setView([14.6350, -90.5150], 13); }
+
+// ==========================================
+// SOCKET.IO - GPS tiempo real
+// ==========================================
+var socket = io('http://localhost:3000');
+
+socket.on('connect', function() {
+  document.getElementById('ultimaAct').textContent = 'Conectado - ' + new Date().toLocaleTimeString();
+});
+
+socket.on('gps_update', function(data) {
+  document.getElementById('ultimaAct').textContent = 'Actualizado: ' + new Date().toLocaleTimeString();
+  actualizarMarcadorUnidad(data);
+  actualizarPanelUnidad(data);
+});
+
+function actualizarMarcadorUnidad(data) {
+  var iconHtml = '<div style="background:#0F0DFF;color:white;font-size:10px;font-weight:700;padding:3px 6px;border-radius:6px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.3);white-space:nowrap">' + data.numero + '</div>';
+  var icon = L.divIcon({ html: iconHtml, className: '', iconAnchor: [20, 12] });
+
+  if (unidadesMarkers[data.unidad_id]) {
+    unidadesMarkers[data.unidad_id].setLatLng([data.lat, data.lng]);
+    unidadesMarkers[data.unidad_id].setPopupContent(popupContent(data));
+  } else {
+    var marker = L.marker([data.lat, data.lng], { icon: icon });
+    marker.bindPopup(popupContent(data));
+    marker.addTo(map);
+    unidadesMarkers[data.unidad_id] = marker;
+  }
+}
+
+function popupContent(data) {
+  return '<div style="min-width:180px"><strong>Unidad ' + data.numero + '</strong><br><span style="font-size:12px">Velocidad: ' + parseFloat(data.velocidad||0).toFixed(1) + ' km/h</span><br><span style="font-size:11px;color:#666">Lat: ' + parseFloat(data.lat).toFixed(5) + ', Lng: ' + parseFloat(data.lng).toFixed(5) + '</span></div>';
+}
+
+function actualizarPanelUnidad(data) {
+  var panel = document.getElementById('unidadesPanel');
+  var existing = document.getElementById('pu_' + data.unidad_id);
+  var html = '<div class="num">&#x1F68C; ' + data.numero + '</div><div class="info">Vel: ' + parseFloat(data.velocidad||0).toFixed(1) + ' km/h | ' + new Date().toLocaleTimeString() + '</div>';
+  if (existing) {
+    existing.innerHTML = html;
+  } else {
+    var div = document.createElement('div');
+    div.className = 'unidad-card';
+    div.id = 'pu_' + data.unidad_id;
+    div.innerHTML = html;
+    div.addEventListener('click', function() {
+      if (unidadesMarkers[data.unidad_id]) {
+        map.setView(unidadesMarkers[data.unidad_id].getLatLng(), 16);
+        unidadesMarkers[data.unidad_id].openPopup();
+      }
+      document.querySelectorAll('.unidad-card').forEach(function(c) { c.classList.remove('active'); });
+      div.classList.add('active');
+    });
+    if (panel.querySelector('.loading')) panel.innerHTML = '';
+    panel.appendChild(div);
+    document.getElementById('countUnidades').textContent = Object.keys(unidadesMarkers).length + 1;
+  }
+}
+
+// Cargar paradas de la BD y mostrar en mapa
+async function cargarParadasDB() {
+  try {
+    var rutas = await api.get('/rutas');
+    rutas.forEach(function(r) {
+      if (r.paradas && r.paradas.length) {
+        r.paradas.forEach(function(p) {
+          if (p.latitud && p.longitud) {
+            var marker = L.circleMarker([p.latitud, p.longitud], {
+              radius: 6, fillColor: r.color||'#666', color: 'white', weight: 2, fillOpacity: 1
+            }).addTo(map);
+            marker.bindPopup('<strong>' + p.nombre + '</strong><br><span style="font-size:12px;color:#666">' + r.nombre + '</span>');
+          }
+        });
+      }
+    });
+  } catch(e) {}
+}
+cargarParadasDB();
+</script>
+</body>
+</html>

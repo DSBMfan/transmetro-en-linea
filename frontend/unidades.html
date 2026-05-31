@@ -1,0 +1,158 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Unidades - Transmetro en Linea</title>
+<link rel="stylesheet" href="/css/styles.css">
+<script src="/js/api.js"></script>
+
+</head><body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo" style="background:white;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.1)">
+    <img src="/assets/images/logos/Logo-Transmetro.png" alt="Transmetro en Linea" style="width:100%;max-width:175px;height:auto;display:block">
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <a class="nav-item" data-page="dashboard"><span class="nav-icon">&#x1F4CA;</span> Dashboard</a>
+    <div class="nav-section">Gestion</div>
+    <a class="nav-item" data-page="rutas"><span class="nav-icon">&#x1F6E3;&#xFE0F;</span> Rutas</a>
+    <a class="nav-item" data-page="unidades"><span class="nav-icon">&#x1F68C;</span> Unidades</a>
+    <a class="nav-item" data-page="conductores"><span class="nav-icon">&#x1F464;</span> Conductores</a>
+    <a class="nav-item" data-page="asignaciones"><span class="nav-icon">&#x1F517;</span> Asignaciones</a>
+    <div class="nav-section">Operaciones</div>
+    <a class="nav-item" data-page="monitoreo"><span class="nav-icon">&#x1F5FA;&#xFE0F;</span> Monitoreo GPS</a>
+    <a class="nav-item" data-page="reportes"><span class="nav-icon">&#x1F4C8;</span> Reportes</a>
+    <div class="nav-section">Admin</div>
+    <a class="nav-item" data-page="usuarios"><span class="nav-icon">&#x1F465;</span> Usuarios</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="avatar" id="sidebarAvatar">A</div>
+      <div class="user-info"><strong id="sidebarName">Admin</strong><small id="sidebarRol">admin</small></div>
+    </div>
+    <button id="logoutBtn" class="btn btn-danger btn-sm" style="width:100%;margin-top:10px">Cerrar sesion</button>
+  </div>
+</aside>
+<div class="main-content">
+<div class="topbar">
+<div class="topbar-title">Unidades</div>
+<div class="topbar-right"><div class="topbar-avatar" id="topbarAvatar">A</div></div>
+</div>
+<div class="page-content">
+<div class="page-header">
+  <div><h1>Gestion de Unidades</h1><p>Registro y control de buses del sistema</p></div>
+  <button class="btn btn-primary" onclick="abrirModal()">+ Nueva Unidad</button>
+</div>
+<div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+  <div class="stat-card"><div class="stat-icon azul">&#x1F68C;</div><div><div class="stat-value" id="stT">0</div><div class="stat-label">Total</div></div></div>
+  <div class="stat-card"><div class="stat-icon verde">&#x2705;</div><div><div class="stat-value" id="stS">0</div><div class="stat-label">En Servicio</div></div></div>
+  <div class="stat-card"><div class="stat-icon naranja">&#x1F527;</div><div><div class="stat-value" id="stM">0</div><div class="stat-label">Mantenimiento</div></div></div>
+  <div class="stat-card"><div class="stat-icon rojo">&#x274C;</div><div><div class="stat-value" id="stF">0</div><div class="stat-label">Fuera Servicio</div></div></div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <h3>Lista de Unidades</h3>
+    <div class="search-bar" style="margin:0">
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar por numero, placa, modelo..." oninput="filtrar(this.value)" style="min-width:280px">
+      <select class="form-control" id="filterEstado" onchange="filtrar()" style="width:auto">
+        <option value="">Todos los estados</option>
+        <option value="en_servicio">En Servicio</option>
+        <option value="en_mantenimiento">En Mantenimiento</option>
+        <option value="fuera_de_servicio">Fuera de Servicio</option>
+      </select>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="table-wrap"><table>
+      <thead><tr><th>No.</th><th>Numero</th><th>Placa</th><th>Modelo</th><th>Año</th><th>Capacidad</th><th>Conductor</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody id="tbUnidades"><tr><td colspan="9" class="loading"><div class="spinner"></div></td></tr></tbody>
+    </table></div>
+  </div>
+</div>
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal"><div class="modal-header"><h3 id="modalTitle">Nueva Unidad</h3><button class="modal-close" onclick="cerrarModal()">x</button></div>
+  <div class="modal-body">
+    <input type="hidden" id="editId">
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Numero de Unidad *</label><input class="form-control" id="fNumero" placeholder="BRT-001" required></div>
+      <div class="form-group"><label class="form-label">Placa</label><input class="form-control" id="fPlaca" placeholder="GTM-001"></div>
+      <div class="form-group"><label class="form-label">Modelo</label><input class="form-control" id="fModelo" placeholder="Volvo 7900"></div>
+      <div class="form-group"><label class="form-label">Año</label><input class="form-control" type="number" id="fAnio" placeholder="2024"></div>
+      <div class="form-group"><label class="form-label">Capacidad</label><input class="form-control" type="number" id="fCapacidad" value="80"></div>
+      <div class="form-group"><label class="form-label">Estado</label><select class="form-control" id="fEstado"><option value="en_servicio">En Servicio</option><option value="en_mantenimiento">En Mantenimiento</option><option value="fuera_de_servicio">Fuera de Servicio</option></select></div>
+    </div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button><button class="btn btn-primary" onclick="guardar()">Guardar</button></div>
+  </div>
+</div>
+<script>
+var unidades=[], loadId=0;
+async function cargar(){
+  var mid=++loadId;
+  document.getElementById("tbUnidades").innerHTML="<tr><td colspan='9' class='loading'><div class='spinner'></div></td></tr>";
+  try{
+    var d=await api.get("/unidades/estadisticas");
+    if(mid!==loadId)return;
+    document.getElementById("stT").textContent=d.total||0;
+    document.getElementById("stS").textContent=d.en_servicio||0;
+    document.getElementById("stM").textContent=d.en_mantenimiento||0;
+    document.getElementById("stF").textContent=d.fuera_servicio||0;
+  }catch(e){}
+  try{
+    var data=await api.get("/unidades");
+    if(mid!==loadId)return;
+    unidades=data;
+    renderTabla(unidades);
+  }catch(e){
+    if(mid!==loadId)return;
+    document.getElementById("tbUnidades").innerHTML="<tr><td colspan='9' style='text-align:center;color:#ef4444;padding:24px'>⚠️ Error al cargar unidades. Verifica que el servidor esté activo.</td></tr>";
+  }
+}
+function renderTabla(data){
+  var tb=document.getElementById("tbUnidades");
+  if(!data.length){tb.innerHTML="<tr><td colspan=9 style='text-align:center;padding:30px;color:#9ca3af'>No hay unidades registradas</td></tr>";return;}
+  tb.innerHTML=data.map(function(u,i){
+    var conductor=u.conductor_nombre?u.conductor_nombre+" "+u.conductor_apellido:"<span style='color:#9ca3af'>Sin asignar</span>";
+    var estadoBadge=badgeEstadoUnidad(u.estado);
+    return "<tr><td>"+(i+1)+"</td><td><strong>"+u.numero+"</strong></td><td>"+(u.placa||"-")+"</td><td>"+(u.modelo||"-")+"</td><td>"+(u.anio||"-")+"</td><td>"+(u.capacidad||"-")+"</td><td>"+conductor+"</td><td>"+estadoBadge+"</td><td><div style='display:flex;gap:6px'><button class='btn btn-sm btn-outline' onclick='editar("+u.id+")'>Editar</button><button class='btn btn-sm btn-danger' onclick='eliminar("+u.id+")'>Eliminar</button></div></td></tr>";
+  }).join("");
+}
+function filtrar(val){
+  var q=(val||document.getElementById("searchInput").value).toLowerCase();
+  var e=document.getElementById("filterEstado").value;
+  var f=unidades.filter(function(u){
+    var match=!q||(u.numero||"").toLowerCase().includes(q)||(u.placa||"").toLowerCase().includes(q)||(u.modelo||"").toLowerCase().includes(q);
+    var stMatch=!e||u.estado===e;
+    return match&&stMatch;
+  });
+  renderTabla(f);
+}
+function abrirModal(data){
+  document.getElementById("modalTitle").textContent=data?"Editar Unidad":"Nueva Unidad";
+  document.getElementById("editId").value=data?data.id:"";
+  document.getElementById("fNumero").value=data?data.numero:"";
+  document.getElementById("fPlaca").value=data?data.placa:"";
+  document.getElementById("fModelo").value=data?data.modelo:"";
+  document.getElementById("fAnio").value=data?data.anio:"";
+  document.getElementById("fCapacidad").value=data?data.capacidad:80;
+  document.getElementById("fEstado").value=data?data.estado:"en_servicio";
+  document.getElementById("modalOverlay").classList.add("active");
+}
+function cerrarModal(){document.getElementById("modalOverlay").classList.remove("active");}
+async function editar(id){var u=unidades.find(function(x){return x.id===id;});if(u)abrirModal(u);}
+async function guardar(){
+  var id=document.getElementById("editId").value;
+  var data={numero:document.getElementById("fNumero").value,placa:document.getElementById("fPlaca").value,modelo:document.getElementById("fModelo").value,anio:document.getElementById("fAnio").value,capacidad:document.getElementById("fCapacidad").value,estado:document.getElementById("fEstado").value};
+  try{
+    if(id)await api.put("/unidades/"+id,data); else await api.post("/unidades",data);
+    toast(id?"Unidad actualizada":"Unidad registrada","success");
+    cerrarModal();await cargar();
+  }catch(e){toast(e.message,"error");}
+}
+async function eliminar(id){
+  if(!confirm("Eliminar esta unidad?"))return;
+  try{await api.del("/unidades/"+id);toast("Unidad eliminada","success");await cargar();}catch(e){toast(e.message,"error");}
+}
+cargar();
+</script>
+</div></div>
+<script>setupSidebar("unidades")</script>
+</body></html>

@@ -1,0 +1,11 @@
+const router = require('express').Router();
+const c = require('../controllers/conductoresController');
+const { verificarToken } = require('../middleware/auth');
+router.use(verificarToken);
+router.get('/', c.listar);
+router.get('/:id', c.obtener);
+router.post('/', c.crear);
+router.put('/:id', c.actualizar);
+router.patch('/:id/asignar-unidad', c.asignarUnidad);
+router.delete('/:id', c.eliminar);
+module.exports = router;

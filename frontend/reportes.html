@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reportes - Transmetro en Linea</title>
+<link rel="stylesheet" href="/css/styles.css">
+<script src="/js/api.js"></script>
+</head>
+<body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo" style="background:white;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.1)">
+    <img src="/assets/images/logos/Logo-Transmetro.png" alt="Transmetro en Linea" style="width:100%;max-width:175px;height:auto;display:block">
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <a class="nav-item" data-page="dashboard"><span class="nav-icon">&#x1F4CA;</span> Dashboard</a>
+    <div class="nav-section">Gestion</div>
+    <a class="nav-item" data-page="rutas"><span class="nav-icon">&#x1F6E3;&#xFE0F;</span> Rutas</a>
+    <a class="nav-item" data-page="unidades"><span class="nav-icon">&#x1F68C;</span> Unidades</a>
+    <a class="nav-item" data-page="conductores"><span class="nav-icon">&#x1F464;</span> Conductores</a>
+    <a class="nav-item" data-page="asignaciones"><span class="nav-icon">&#x1F517;</span> Asignaciones</a>
+    <div class="nav-section">Operaciones</div>
+    <a class="nav-item" data-page="monitoreo"><span class="nav-icon">&#x1F5FA;&#xFE0F;</span> Monitoreo GPS</a>
+    <a class="nav-item" data-page="reportes"><span class="nav-icon">&#x1F4C8;</span> Reportes</a>
+    <div class="nav-section">Admin</div>
+    <a class="nav-item" data-page="usuarios"><span class="nav-icon">&#x1F465;</span> Usuarios</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="avatar" id="sidebarAvatar">A</div>
+      <div class="user-info"><strong id="sidebarName">Admin</strong><small id="sidebarRol">admin</small></div>
+    </div>
+    <button id="logoutBtn" class="btn btn-danger btn-sm" style="width:100%;margin-top:10px">Cerrar sesion</button>
+  </div>
+</aside>
+
+<div class="main-content">
+  <div class="topbar">
+    <div class="topbar-title">&#x1F4C8; Reportes y Estadisticas</div>
+    <div class="topbar-right"><div class="topbar-avatar" id="topbarAvatar">A</div></div>
+  </div>
+  <div class="page-content">
+    <div class="page-header">
+      <div><h1>Reportes</h1><p>Genera y exporta reportes del sistema Transmetro</p></div>
+    </div>
+
+    <div class="stats-grid" style="margin-bottom:24px">
+      <div class="stat-card"><div class="stat-icon azul">&#x1F68C;</div><div><div class="stat-value" id="rTotal">--</div><div class="stat-label">Total Unidades</div></div></div>
+      <div class="stat-card"><div class="stat-icon verde">&#x2705;</div><div><div class="stat-value" id="rServicio">--</div><div class="stat-label">En Servicio</div></div></div>
+      <div class="stat-card"><div class="stat-icon azul">&#x1F6E3;&#xFE0F;</div><div><div class="stat-value" id="rRutas">--</div><div class="stat-label">Rutas Activas</div></div></div>
+      <div class="stat-card"><div class="stat-icon verde">&#x1F464;</div><div><div class="stat-value" id="rConductores">--</div><div class="stat-label">Conductores Activos</div></div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px">
+      <div class="card">
+        <div class="card-header"><h3>Estado de Flota</h3></div>
+        <div class="card-body" style="display:flex;align-items:center;justify-content:center;height:280px">
+          <canvas id="chartFlota"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Asignaciones por Ruta</h3></div>
+        <div class="card-body" style="display:flex;align-items:center;justify-content:center;height:280px">
+          <canvas id="chartRutas"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>Exportar Reportes</h3></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+
+          <div style="border:1px solid var(--border);border-radius:12px;padding:20px">
+            <div style="font-size:28px;margin-bottom:8px">&#x1F68C;</div>
+            <h4 style="font-size:14px;font-weight:700;margin-bottom:4px">Reporte de Unidades</h4>
+            <p style="font-size:12px;color:var(--text-light);margin-bottom:14px">Estado, modelo y capacidad de todas las unidades</p>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm btn-danger" onclick="exportar('pdf','unidades')">&#x1F4C4; PDF</button>
+              <button class="btn btn-sm btn-success" onclick="exportar('excel','unidades')">&#x1F4CA; Excel</button>
+            </div>
+          </div>
+
+          <div style="border:1px solid var(--border);border-radius:12px;padding:20px">
+            <div style="font-size:28px;margin-bottom:8px">&#x1F464;</div>
+            <h4 style="font-size:14px;font-weight:700;margin-bottom:4px">Reporte de Conductores</h4>
+            <p style="font-size:12px;color:var(--text-light);margin-bottom:14px">Informacion y estado de todos los conductores</p>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm btn-danger" onclick="exportar('pdf','conductores')">&#x1F4C4; PDF</button>
+              <button class="btn btn-sm btn-success" onclick="exportar('excel','conductores')">&#x1F4CA; Excel</button>
+            </div>
+          </div>
+
+          <div style="border:1px solid var(--border);border-radius:12px;padding:20px">
+            <div style="font-size:28px;margin-bottom:8px">&#x1F6E3;&#xFE0F;</div>
+            <h4 style="font-size:14px;font-weight:700;margin-bottom:4px">Reporte de Rutas</h4>
+            <p style="font-size:12px;color:var(--text-light);margin-bottom:14px">Listado completo de rutas y su estado actual</p>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm btn-danger" onclick="exportar('pdf','rutas')">&#x1F4C4; PDF</button>
+              <button class="btn btn-sm btn-success" onclick="exportar('excel','rutas')">&#x1F4CA; Excel</button>
+            </div>
+          </div>
+
+          <div style="border:1px solid var(--border);border-radius:12px;padding:20px">
+            <div style="font-size:28px;margin-bottom:8px">&#x1F517;</div>
+            <h4 style="font-size:14px;font-weight:700;margin-bottom:4px">Reporte de Asignaciones</h4>
+            <p style="font-size:12px;color:var(--text-light);margin-bottom:14px">Asignaciones activas de buses, rutas y conductores</p>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm btn-danger" onclick="exportar('pdf','asignaciones')">&#x1F4C4; PDF</button>
+              <button class="btn btn-sm btn-success" onclick="exportar('excel','asignaciones')">&#x1F4CA; Excel</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+setupSidebar('reportes');
+
+async function cargarStats() {
+  try {
+    var d = await api.get('/reportes/estadisticas');
+    document.getElementById('rTotal').textContent = d.unidades.total;
+    document.getElementById('rServicio').textContent = d.unidades.activas;
+    document.getElementById('rRutas').textContent = d.rutas.activas;
+    document.getElementById('rConductores').textContent = d.conductores.activos;
+
+    new Chart(document.getElementById('chartFlota'), {
+      type: 'doughnut',
+      data: {
+        labels: ['En Servicio', 'Mantenimiento', 'Fuera de Servicio'],
+        datasets: [{ data: [d.unidades.activas, d.unidades.mantenimiento, d.unidades.inactivas], backgroundColor: ['#86ED5A', '#f59e0b', '#ef4444'], borderWidth: 2, borderColor: '#fff' }]
+      },
+      options: { cutout: '65%', plugins: { legend: { position: 'bottom', labels: { font: { size: 12 } } } } }
+    });
+  } catch(e) {}
+}
+
+async function cargarChartRutas() {
+  try {
+    var asigs = await api.get('/asignaciones');
+    var conteo = {};
+    asigs.filter(function(a) { return a.estado === 'activa'; }).forEach(function(a) {
+      conteo[a.ruta_nombre] = (conteo[a.ruta_nombre] || 0) + 1;
+    });
+    var labels = Object.keys(conteo);
+    var values = Object.values(conteo);
+    var colors = ['#0F0DFF','#86ED5A','#f59e0b','#ef4444','#8B008B','#228B22','#FF6600','#00BFFF'];
+    new Chart(document.getElementById('chartRutas'), {
+      type: 'bar',
+      data: { labels: labels, datasets: [{ label: 'Unidades asignadas', data: values, backgroundColor: colors.slice(0, labels.length), borderRadius: 6 }] },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+    });
+  } catch(e) {}
+}
+
+async function exportar(formato, tipo) {
+  try {
+    toast('Generando ' + formato.toUpperCase() + '...', 'info');
+    await api.download('/reportes/' + formato + '/' + tipo, tipo + '_reporte.' + (formato === 'pdf' ? 'pdf' : 'xlsx'));
+    toast('Reporte descargado', 'success');
+  } catch(e) { toast('Error al generar reporte: ' + e.message, 'error'); }
+}
+
+cargarStats();
+cargarChartRutas();
+</script>
+</body>
+</html>

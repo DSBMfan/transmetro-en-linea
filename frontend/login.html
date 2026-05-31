@@ -1,0 +1,57 @@
+<!DOCTYPE html><html lang='es'><head>
+<meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>Inicio de Sesión - Transmetro en Línea</title>
+<link rel='stylesheet' href='/css/styles.css'>
+
+</head><body>
+<div style='min-height:100vh;display:flex;background:linear-gradient(135deg,#0d0d2b 0%,#1a1a6e 100%)'>
+  <div style='flex:1;display:flex;align-items:center;justify-content:center;padding:40px'>
+    <div style='text-align:center;color:white;max-width:400px'>
+      <img src='/assets/images/logos/escudo-guatemala.png' alt='Escudo Guatemala' style='width:160px;height:auto;margin-bottom:20px;filter:drop-shadow(0 6px 20px rgba(0,0,0,0.5))'>
+      <h1 style='font-size:32px;font-weight:800;margin-bottom:10px'>TRANSMETRO<br><span style='color:#86ED5A'>EN LÍNEA</span></h1>
+      <p style='color:rgba(255,255,255,0.6);font-size:15px'>Sistema de Gestión de Transporte</p>
+    </div>
+  </div>
+  <div style='flex:1;display:flex;align-items:center;justify-content:center;background:white;padding:40px;border-radius:40px 0 0 40px'>
+    <div style='width:100%;max-width:380px'>
+      <h2 style='font-size:24px;font-weight:700;margin-bottom:6px'>Bienvenido</h2>
+      <p style='color:#6b7280;margin-bottom:28px;font-size:14px'>Inicia sesión para continuar</p>
+      <div id='alertMsg'></div>
+      <form id='loginForm'>
+        <div class='form-group'>
+          <label class='form-label'>Correo electrónico</label>
+          <input type='email' id='email' class='form-control' placeholder='admin@transmetro.gt' required>
+        </div>
+        <div class='form-group'>
+          <label class='form-label'>Contraseña</label>
+          <input type='password' id='password' class='form-control' placeholder='••••••••' required>
+        </div>
+        <button type='submit' class='btn btn-primary' style='width:100%;padding:12px;font-size:15px;margin-top:8px' id='loginBtn'>Iniciar Sesión</button>
+      </form>
+      <p style='text-align:center;color:#9ca3af;font-size:12px;margin-top:24px'>Transmetro en Línea v1.0 &copy; 2024</p>
+    </div>
+  </div>
+</div>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  btn.textContent = 'Iniciando...'; btn.disabled = true;
+  const alertMsg = document.getElementById('alertMsg');
+  alertMsg.innerHTML = '';
+  try {
+    const res = await fetch('http://localhost:3000/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error al iniciar sesión');
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('usuario', JSON.stringify(data.usuario));
+    window.location.href = '/dashboard.html';
+  } catch(err) {
+    alertMsg.innerHTML = '<div class="alert alert-danger">' + err.message + '</div>';
+    btn.textContent = 'Iniciar Sesión'; btn.disabled = false;
+  }
+});
+</script></body></html>

@@ -1,0 +1,12 @@
+const router = require('express').Router();
+const c = require('../controllers/unidadesController');
+const { verificarToken } = require('../middleware/auth');
+router.use(verificarToken);
+router.get('/', c.listar);
+router.get('/estadisticas', c.estadisticas);
+router.get('/:id', c.obtener);
+router.post('/', c.crear);
+router.put('/:id', c.actualizar);
+router.patch('/:id/estado', c.actualizarEstado);
+router.delete('/:id', c.eliminar);
+module.exports = router;

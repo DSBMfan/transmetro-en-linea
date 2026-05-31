@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard - Transmetro en Linea</title>
+<link rel="stylesheet" href="/css/styles.css">
+<script src="/js/api.js"></script>
+</head><body>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo" style="background:white;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.1)">
+    <img src="/assets/images/logos/Logo-Transmetro.png" alt="Transmetro en Linea" style="width:100%;max-width:175px;height:auto;display:block">
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <a class="nav-item" data-page="dashboard"><span class="nav-icon">&#x1F4CA;</span> Dashboard</a>
+    <div class="nav-section">Gestion</div>
+    <a class="nav-item" data-page="rutas"><span class="nav-icon">&#x1F6E3;&#xFE0F;</span> Rutas</a>
+    <a class="nav-item" data-page="unidades"><span class="nav-icon">&#x1F68C;</span> Unidades</a>
+    <a class="nav-item" data-page="conductores"><span class="nav-icon">&#x1F464;</span> Conductores</a>
+    <a class="nav-item" data-page="asignaciones"><span class="nav-icon">&#x1F517;</span> Asignaciones</a>
+    <div class="nav-section">Operaciones</div>
+    <a class="nav-item" data-page="monitoreo"><span class="nav-icon">&#x1F5FA;&#xFE0F;</span> Monitoreo GPS</a>
+    <a class="nav-item" data-page="reportes"><span class="nav-icon">&#x1F4C8;</span> Reportes</a>
+    <div class="nav-section">Admin</div>
+    <a class="nav-item" data-page="usuarios"><span class="nav-icon">&#x1F465;</span> Usuarios</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="avatar" id="sidebarAvatar">A</div>
+      <div class="user-info"><strong id="sidebarName">Admin</strong><small id="sidebarRol">admin</small></div>
+    </div>
+    <button id="logoutBtn" class="btn btn-danger btn-sm" style="width:100%;margin-top:10px">Cerrar sesion</button>
+  </div>
+</aside>
+<div class="main-content">
+<div class="topbar">
+<div class="topbar-title">Dashboard</div>
+<div class="topbar-right"><div class="topbar-avatar" id="topbarAvatar">A</div></div>
+</div>
+<div class="page-content">
+<div class="page-header">
+  <div><h1>Panel Principal</h1><p>Resumen general del sistema</p></div>
+  <span id="fechaHora" style="color:#6b7280;font-size:13px"></span>
+</div>
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-icon azul">&#x1F68C;</div><div><div class="stat-value" id="stTotal">--</div><div class="stat-label">Total Unidades</div></div></div>
+  <div class="stat-card"><div class="stat-icon verde">&#x2705;</div><div><div class="stat-value" id="stServicio">--</div><div class="stat-label">En Servicio</div></div></div>
+  <div class="stat-card"><div class="stat-icon naranja">&#x1F527;</div><div><div class="stat-value" id="stMant">--</div><div class="stat-label">En Mantenimiento</div></div></div>
+  <div class="stat-card"><div class="stat-icon rojo">&#x274C;</div><div><div class="stat-value" id="stFuera">--</div><div class="stat-label">Fuera de Servicio</div></div></div>
+  <div class="stat-card"><div class="stat-icon verde">&#x1F6E3;&#xFE0F;</div><div><div class="stat-value" id="stRutas">--</div><div class="stat-label">Rutas Activas</div></div></div>
+  <div class="stat-card"><div class="stat-icon azul">&#x1F464;</div><div><div class="stat-value" id="stConductores">--</div><div class="stat-label">Conductores Activos</div></div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px">
+  <div class="card"><div class="card-header"><h3>Estado de Unidades</h3></div>
+    <div class="card-body" style="display:flex;align-items:center;justify-content:center;height:260px"><canvas id="chartUnidades" style="max-height:240px"></canvas></div></div>
+  <div class="card"><div class="card-header"><h3>Accesos Rapidos</h3></div>
+    <div class="card-body"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <a href="/rutas.html" class="btn btn-primary" style="justify-content:center">Rutas</a>
+      <a href="/unidades.html" class="btn btn-success" style="justify-content:center">Unidades</a>
+      <a href="/conductores.html" class="btn btn-secondary" style="justify-content:center">Conductores</a>
+      <a href="/monitoreo.html" class="btn btn-outline" style="justify-content:center">Mapa GPS</a>
+      <a href="/asignaciones.html" class="btn btn-warning" style="justify-content:center;color:white">Asignaciones</a>
+      <a href="/reportes.html" class="btn btn-secondary" style="justify-content:center">Reportes</a>
+    </div></div></div>
+</div>
+<div class="card"><div class="card-header"><h3>Asignaciones Activas</h3></div>
+  <div class="card-body"><div class="table-wrap"><table>
+    <thead><tr><th>Unidad</th><th>Ruta</th><th>Conductor</th><th>Desde</th><th>Estado</th></tr></thead>
+    <tbody id="tbAsig"><tr><td colspan="5" class="loading"><div class="spinner"></div> Cargando...</td></tr></tbody>
+  </table></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+setInterval(function(){document.getElementById("fechaHora").textContent=new Date().toLocaleString("es-GT");},1000);
+async function loadStats(){
+  try{
+    var d=await api.get("/reportes/estadisticas");
+    document.getElementById("stTotal").textContent=d.unidades.total;
+    document.getElementById("stServicio").textContent=d.unidades.activas;
+    document.getElementById("stMant").textContent=d.unidades.mantenimiento;
+    document.getElementById("stFuera").textContent=d.unidades.inactivas;
+    document.getElementById("stRutas").textContent=d.rutas.activas;
+    document.getElementById("stConductores").textContent=d.conductores.activos;
+    new Chart(document.getElementById("chartUnidades"),{type:"doughnut",data:{labels:["En Servicio","Mantenimiento","Fuera"],datasets:[{data:[d.unidades.activas,d.unidades.mantenimiento,d.unidades.inactivas],backgroundColor:["#86ED5A","#f59e0b","#ef4444"],borderWidth:0}]},options:{cutout:"70%",plugins:{legend:{position:"bottom"}}}});
+  }catch(e){}
+}
+async function loadAsig(){
+  try{
+    var rows=await api.get("/asignaciones");
+    var activas=rows.filter(function(r){return r.estado==="activa";}).slice(0,8);
+    var tb=document.getElementById("tbAsig");
+    if(!activas.length){tb.innerHTML="<tr><td colspan=5 style='text-align:center;padding:20px;color:#9ca3af'>Sin asignaciones activas</td></tr>";return;}
+    tb.innerHTML=activas.map(function(a){return "<tr><td><strong>"+a.unidad_numero+"</strong></td><td>"+a.ruta_nombre+"</td><td>"+a.conductor_nombre+" "+a.conductor_apellido+"</td><td>"+a.fecha_inicio+"</td><td><span class='badge badge-success'>Activa</span></td></tr>";}).join("");
+  }catch(e){}
+}
+loadStats();loadAsig();
+</script>
+</div></div>
+<script>setupSidebar("dashboard")</script>
+</body></html>
