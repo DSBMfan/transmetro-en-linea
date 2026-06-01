@@ -2,7 +2,7 @@
 <meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
 <title>Inicio de Sesión - Transmetro en Línea</title>
 <link rel='stylesheet' href='/css/styles.css'>
-
+<script src='/js/api.js'></script>
 </head><body>
 <div style='min-height:100vh;display:flex;background:linear-gradient(135deg,#0d0d2b 0%,#1a1a6e 100%)'>
   <div style='flex:1;display:flex;align-items:center;justify-content:center;padding:40px'>
@@ -40,12 +40,10 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   const alertMsg = document.getElementById('alertMsg');
   alertMsg.innerHTML = '';
   try {
-    const res = await fetch('http://localhost:3000/api/auth/login', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value })
+    const data = await api.post('/auth/login', {
+      email: document.getElementById('email').value,
+      password: document.getElementById('password').value
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Error al iniciar sesión');
     localStorage.setItem('token', data.token);
     localStorage.setItem('usuario', JSON.stringify(data.usuario));
     window.location.href = '/dashboard.html';
