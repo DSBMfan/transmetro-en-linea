@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'transmetro-en-linea-production.up.railway.app';
 const api = {
   getToken: () => localStorage.getItem('token'),
   headers() { return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + this.getToken() }; },
