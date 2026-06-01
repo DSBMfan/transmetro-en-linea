@@ -1,3 +1,7 @@
 node_modules/
 .env
 *.log
+.claude/
+mockup.html
+mockup-server.js
+build_pages.js
